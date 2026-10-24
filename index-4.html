@@ -1,0 +1,531 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#1f6f8b">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Nor10">
+<meta name="description" content="Nor10 挪威語互動練習：複習卡、短文、單字、動詞拼寫、句子重組">
+<style>html{color-scheme:light}html,body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>Nor10 Studio</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700&family=Noto+Sans+TC:wght@400;500;700&display=swap">
+<style>
+/* Layout: one-column app, sticky top bar with mode tabs, content card stage below; phone first. */
+:root{
+  --bg:#f3f6f7; --panel:#ffffff; --fg:#17262b; --muted:#5c6f76; --line:#d5dee2;
+  --accent:#1f6f8b; --accent-ink:#ffffff; --warm:#c8553d; --ok:#2f8f5b; --ok-bg:#e3f3ea; --warn-bg:#fbe9e4;
+  --soft:#e6eef1; --shadow:0 2px 10px rgba(23,38,43,.08);
+  --display:"Rubik","Noto Sans TC",system-ui,sans-serif; --body:"Noto Sans TC","Rubik",system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0f1b20; --panel:#172730; --fg:#e8eef0; --muted:#9db0b8; --line:#2b3f48;
+  --accent:#5fb3cf; --accent-ink:#0b1a20; --warm:#f08a72; --ok:#6fcf97; --ok-bg:#1d3a2b; --warn-bg:#46261f;
+  --soft:#1f333c; --shadow:0 2px 10px rgba(0,0,0,.35); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0f1b20; --panel:#172730; --fg:#e8eef0; --muted:#9db0b8; --line:#2b3f48;
+  --accent:#5fb3cf; --accent-ink:#0b1a20; --warm:#f08a72; --ok:#6fcf97; --ok-bg:#1d3a2b; --warn-bg:#46261f;
+  --soft:#1f333c; --shadow:0 2px 10px rgba(0,0,0,.35); color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--body);font-size:16px;line-height:1.6;margin:0}
+button{font:inherit;cursor:pointer}
+button:focus-visible,input:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.wrap{max-width:760px;margin:0 auto;padding-inline:16px;padding-block:0 48px}
+header.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);padding-block:14px 8px;border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.brand h1{font-family:var(--display);font-size:1.35rem;margin:0;letter-spacing:.01em}
+.brand h1 small{color:var(--muted);font-weight:400;font-size:.85rem;margin-left:8px}
+.streak{font-size:.8rem;color:var(--muted);font-variant-numeric:tabular-nums}
+nav.tabs{display:flex;gap:6px;margin-top:10px;overflow-x:auto;scrollbar-width:none}
+nav.tabs button{border:1px solid var(--line);background:var(--panel);color:var(--fg);border-radius:999px;padding:6px 14px;white-space:nowrap;font-size:.9rem}
+nav.tabs button[aria-selected="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+main{padding-top:18px}
+h2{font-family:var(--display);font-size:1.15rem;margin:0 0 10px;text-wrap:balance}
+p.lead{color:var(--muted);margin:0 0 16px;max-width:60ch}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:12px}
+.deck{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px;text-align:left;color:var(--fg);display:flex;flex-direction:column;gap:6px;min-width:0}
+.deck:hover{border-color:var(--accent)}
+.deck .n{font-family:var(--display);font-size:.75rem;color:var(--accent);letter-spacing:.08em;text-transform:uppercase}
+.deck .t{font-weight:700}
+.deck .d{font-size:.85rem;color:var(--muted)}
+.bar{height:6px;background:var(--soft);border-radius:3px;overflow:hidden;margin-top:4px}
+.bar i{display:block;height:100%;background:var(--ok);width:0}
+.meta{font-size:.78rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.stage{background:var(--panel);border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow);padding:20px;min-width:0}
+.stage .type{display:inline-block;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;padding:2px 8px;border-radius:4px;background:var(--soft);color:var(--muted);font-family:var(--display)}
+.stage .type.concept{color:var(--accent)} .stage .type.comparison{color:var(--warm)} .stage .type.procedure{color:var(--ok)} .stage .type.application{color:#8a5bb3}
+.stage h3{font-family:var(--display);font-size:1.3rem;margin:8px 0 6px;text-wrap:balance}
+.stage .leadtxt{color:var(--fg);background:var(--soft);border-left:3px solid var(--accent);padding:8px 12px;border-radius:0 8px 8px 0;margin:0 0 14px;font-weight:500}
+.pts{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:8px}
+.pts li{display:grid;grid-template-columns:minmax(72px,auto) 1fr;gap:10px;align-items:start;min-width:0}
+.pts b{color:var(--accent);font-weight:600;font-size:.92rem}
+.back{border-top:1px dashed var(--line);margin-top:16px;padding-top:14px;display:flex;flex-direction:column;gap:10px}
+.back .q{background:var(--soft);border-radius:10px;padding:10px 12px}
+.back .q small{display:block;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:2px;font-family:var(--display)}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:14px}
+.btn{border:1px solid var(--line);background:var(--panel);color:var(--fg);border-radius:10px;padding:10px 16px;font-weight:500}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.btn.ok{background:var(--ok-bg);color:var(--ok);border-color:transparent}
+.btn.again{background:var(--warn-bg);color:var(--warm);border-color:transparent}
+.btn.ghost{border-color:transparent;color:var(--muted)}
+.spacer{flex:1}
+.toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px}
+.toolbar select,.toolbar input{font:inherit;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:var(--panel);color:var(--fg)}
+.hint{font-size:.85rem;color:var(--muted)}
+.vq{font-family:var(--display);font-size:1.6rem;margin:6px 0 2px}
+.vq small{font-size:.95rem;color:var(--muted);font-family:var(--body);font-weight:400;margin-left:8px}
+input.answer{font:inherit;font-size:1.15rem;width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--fg);margin-top:10px}
+.fb{margin-top:10px;padding:10px 12px;border-radius:10px;font-weight:500}
+.fb.good{background:var(--ok-bg);color:var(--ok)} .fb.bad{background:var(--warn-bg);color:var(--warm)}
+.chips{display:flex;flex-wrap:wrap;gap:8px;min-height:48px;padding:10px;border:1px dashed var(--line);border-radius:10px;margin-top:10px}
+.chip{border:1px solid var(--line);background:var(--soft);color:var(--fg);border-radius:8px;padding:8px 12px;font-size:1.05rem}
+.chip.placed{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.score{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-bottom:16px}
+.score div{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+.score b{display:block;font-family:var(--display);font-size:1.4rem;font-variant-numeric:tabular-nums}
+.score span{font-size:.78rem;color:var(--muted)}
+.empty{padding:28px;text-align:center;color:var(--muted)}
+.key{font-size:.78rem;color:var(--muted);margin-top:10px}
+.say{all:unset;cursor:pointer;color:var(--accent);border-bottom:1px dotted var(--accent);padding:0 1px;border-radius:2px}
+.say:hover,.say.playing{background:var(--soft)}
+.say:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.spk{border:1px solid var(--line);background:var(--panel);color:var(--accent);border-radius:999px;width:34px;height:34px;display:inline-grid;place-items:center;font-size:1rem;vertical-align:middle;margin-left:8px}
+.spk:hover{border-color:var(--accent)}
+.wl{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.wl li{display:grid;grid-template-columns:1fr auto;gap:4px 12px;padding:10px 0;border-bottom:1px solid var(--line);align-items:center}
+.wl li:last-child{border-bottom:0}
+.wl .no{font-family:var(--display);font-size:1.1rem}
+.wl .zh{color:var(--muted);font-size:.95rem}
+.wl .zh.hide{filter:blur(6px);cursor:pointer;user-select:none}
+.wl .nt{grid-column:1/-1;font-size:.8rem;color:var(--muted)}
+.wl .dot{width:8px;height:8px;border-radius:50%;background:var(--line);display:inline-block;margin-right:6px}
+.wl .dot.k{background:var(--ok)} .wl .dot.m{background:var(--warm)}
+.opts{display:grid;gap:8px;margin-top:12px}
+.opt{text-align:left;border:1px solid var(--line);background:var(--panel);color:var(--fg);border-radius:10px;padding:12px 14px;font-size:1.05rem}
+.opt:hover{border-color:var(--accent)}
+.opt.right{background:var(--ok-bg);border-color:var(--ok);color:var(--ok)}
+.opt.wrong{background:var(--warn-bg);border-color:var(--warm);color:var(--warm)}
+.opt:disabled{cursor:default}
+.theme-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.theme-row button{border:1px solid var(--line);background:var(--panel);color:var(--fg);border-radius:999px;padding:6px 12px;font-size:.88rem}
+.theme-row button[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.theme-row button[aria-pressed="true"] .meta{color:inherit;opacity:.8}
+.st-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px}
+.st-item{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px 14px;text-align:left;color:var(--fg);display:flex;flex-direction:column;gap:4px;min-width:0}
+.st-item:hover{border-color:var(--accent)}
+.st-item .no{font-family:var(--display);color:var(--accent);font-size:.85rem}
+.st-item .t{font-weight:700}
+.st-item .m{font-size:.78rem;color:var(--muted)}
+.st-item.read{border-color:var(--ok)}
+.lines{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.line{display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:start;padding:10px 12px;border-radius:10px;background:var(--soft);cursor:pointer}
+.line .n{font-family:var(--display);font-size:.75rem;color:var(--muted);padding-top:4px;min-width:1.4em}
+.line .no{font-family:var(--display);font-size:1.12rem;line-height:1.5}
+.line .zh{color:var(--muted);font-size:.95rem;margin-top:2px}
+.line .zh.hide{filter:blur(6px);user-select:none}
+.line.cur{outline:2px solid var(--accent)}
+.gl{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.gl span{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:4px 10px;font-size:.88rem}
+.gl span b{font-weight:600;color:var(--accent)}
+.pat{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.pat li{background:var(--soft);border-radius:8px;padding:8px 12px;font-size:.95rem}
+.pat li b{font-family:var(--display);color:var(--accent);display:block}
+.you{background:var(--ok-bg);color:var(--fg);border-radius:10px;padding:10px 12px;margin-top:14px;font-size:.95rem}
+h4{font-family:var(--display);font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:16px 0 0}
+.novoice{font-size:.8rem;color:var(--muted);background:var(--soft);border-radius:8px;padding:8px 12px;margin-top:10px;line-height:1.5}
+@media (prefers-reduced-motion:no-preference){.stage{transition:transform .15s}}
+@media (max-width:480px){.pts li{grid-template-columns:1fr}.stage{padding:16px}}
+</style>
+
+<div class="wrap">
+<header class="top">
+  <div class="brand"><h1>Nor10 Studio <small>Byen er Bergen · Leksjon 1–10</small></h1><div class="streak" id="streak"></div></div>
+  <nav class="tabs" role="tablist" id="tabs">
+    <button role="tab" data-tab="decks" aria-selected="true">複習卡</button>
+    <button role="tab" data-tab="stories" aria-selected="false">短文</button>
+    <button role="tab" data-tab="vocab" aria-selected="false">單字</button>
+    <button role="tab" data-tab="verbs" aria-selected="false">動詞拼寫</button>
+    <button role="tab" data-tab="order" aria-selected="false">句子重組</button>
+    <button role="tab" data-tab="stats" aria-selected="false">進度與發音</button>
+  </nav>
+</header>
+<main id="main"></main>
+</div>
+
+<script>
+const DATA = {"decks": [{"id": "01-verb-ordstilling", "short": "動詞與語序", "description": "動詞怎麼變、句子怎麼排", "cards": [{"id": "C1", "type": "concept", "title": "現在式怎麼變", "lead": "原形去掉 å，字尾加 r，就是現在式。", "points": [{"label": "原形", "body": "字典裡的樣子，前面有 å：å snakke（說）、å spise（吃）。"}, {"label": "現在式", "body": "把 å 拿掉、字尾加 r：snakker、spiser。不管主詞是誰都一樣，不用像英文加 s。"}, {"label": "要背的例外", "body": "gjøre→gjør（做）、si→sier（說）、spørre→spør（問）、vite→vet（知道）、være→er（是）。"}], "q1": "原形變現在式的規則是什麼？五個例外是哪些？", "q2": "看到 jeg vet，怎麼知道它的原形是 vite？為什麼不能用「去掉 r」倒推？"}, {"id": "C2", "type": "concept", "title": "現在式的三種用法", "lead": "挪威語沒有進行式，現在式一個打三個。", "points": [{"label": "現在正在做", "body": "Jeg er på forelesning.（我在上課。）Du spiser frokost nå.（你現在在吃早餐。）"}, {"label": "平常習慣", "body": "Hun drikker kaffe om morgenen.（她早上都喝咖啡。）"}, {"label": "未來的事", "body": "加上時間詞就能講未來：Han reiser til Oslo neste fredag.（他下週五去奧斯陸。）"}], "q1": "現在式可以表達哪三種時間？各舉一句。", "q2": "Jeg ringer deg（我打給你）這句，怎麼知道是「現在」還是「等一下」？靠什麼字判斷？"}, {"id": "C3", "type": "concept", "title": "V2：動詞永遠排第二", "lead": "一句話裡，動詞一定是第二個「位置」。", "points": [{"label": "規則", "body": "完整的句子裡，動詞固定在第 2 位。這是挪威語最重要的語序規則。"}, {"label": "「位置」不是「字」", "body": "I dag 是兩個字，但算一個位置。所以 I dag spiser jeg（今天我吃）動詞還是第 2 位。"}, {"label": "有兩個動詞時", "body": "只有第一個動詞要守第 2 位：Jeg pleier å drikke kaffe.（我習慣喝咖啡。）pleier 第 2 位，å drikke 在後面。"}], "q1": "V2 規則是什麼？有兩個動詞時哪一個要排第二？", "q2": "Jeg pleier å drikke kaffe 這句，哪個字被 V2 綁住？另一個動詞在哪？"}, {"id": "C4", "type": "comparison", "title": "為什麼主詞會跑到後面", "lead": "句首被別的字佔走，動詞要守第二位，主詞只好退到第三。", "points": [{"label": "原本", "body": "Jeg bor i Bergen nå.（我現在住在卑爾根。）主詞 jeg 第 1，動詞 bor 第 2。"}, {"label": "把 nå 搬到句首", "body": "第 1 位變成 nå。動詞一定要第 2，所以 bor 跟上來；jeg 退到第 3。"}, {"label": "結果", "body": "Nå bor jeg i Bergen. 這叫倒裝，意思不變，只是強調「現在」。"}, {"label": "常見錯誤", "body": "Nå jeg bor i Bergen ✗，動詞掉到第 3 位了。"}], "q1": "什麼時候會倒裝？倒裝後主詞在第幾位？", "q2": "把 I dag 放句首時，為什麼是「主詞」往後退，而不是動詞往後退？"}, {"id": "C5", "type": "concept", "title": "問句的排法", "lead": "是非問句動詞開頭，疑問詞問句疑問詞開頭，動詞都緊跟著。", "points": [{"label": "是非問句", "body": "直接動詞開頭：Snakker du engelsk?（你會說英文嗎？）回答 ja 或 nei。"}, {"label": "疑問詞問句", "body": "疑問詞第 1，動詞第 2：Hva studerer du?（你讀什麼？）"}, {"label": "有兩個動詞", "body": "第二個動詞一樣加 å、放主詞後面：Pleier du å spise frokost?（你平常吃早餐嗎？）"}], "q1": "兩種問句各怎麼開頭？第二個動詞放哪？", "q2": "是非問句動詞在第 1 位，算不算違反 V2？疑問詞問句為什麼還是符合 V2？"}, {"id": "C6", "type": "concept", "title": "ikke 放哪裡", "lead": "ikke（不）放在第一個動詞的正後面。", "points": [{"label": "規則", "body": "ikke 緊跟在第一個動詞後面。"}, {"label": "一個動詞", "body": "Han vet ikke.（他不知道。）Vi studerer ikke sammen.（我們不一起讀書。）"}, {"label": "兩個動詞", "body": "Jeg pleier ikke å drikke kaffe.（我平常不喝咖啡。）ikke 夾在 pleier 和 å drikke 中間。"}], "q1": "ikke 放哪裡？有兩個動詞時夾在哪？", "q2": "Jeg skal kjøpe melk（我要買牛奶）改成否定，ikke 放哪？為什麼？"}, {"id": "C7", "type": "concept", "title": "第二個動詞要加 å", "lead": "兩個動詞連用，第二個前面加 å、用原形。", "points": [{"label": "規則", "body": "像英文的 to：Jeg liker å smake nye retter.（我喜歡嚐新菜。）"}, {"label": "常見搭配", "body": "like（喜歡）、pleie（習慣）、prøve（試著）、begynne（開始）後面都接 å。"}, {"label": "例外", "body": "情態動詞（skal、vil、kan、må、bør）後面不加 å。"}], "q1": "兩個動詞連用，第二個長什麼樣？哪些動詞常接 å？", "q2": "Begynner du å bli sulten?（你開始餓了嗎？）如果把 begynner 換成 vil，å 還在嗎？"}, {"id": "C8", "type": "concept", "title": "五個情態動詞", "lead": "skal 計畫、vil 想要、kan 可以、må 必須、bør 應該。", "points": [{"label": "skal", "body": "計畫、打算：Han skal spise.（他要吃了。）"}, {"label": "vil", "body": "想要：Jeg vil spise en banan.（我想吃香蕉。）"}, {"label": "kan", "body": "會、可以、可能：Jeg kan besøke deg.（我可以去找你。）"}, {"label": "må", "body": "必須：Nå må jeg kjøpe melk.（我現在得買牛奶。）"}, {"label": "bør", "body": "應該、最好：Han bør spise.（他最好吃一點。）"}], "q1": "五個情態動詞各是什麼意思？", "q2": "Du må spise 和 Du bør spise，聽起來壓力差在哪？"}, {"id": "C9", "type": "procedure", "title": "要不要加 å，看前面那個動詞", "lead": "前面是一般動詞就加 å；是情態動詞就不加。", "points": [{"label": "一般動詞", "body": "liker、pleier、prøver 後面 → å + 原形：Jeg liker å lage mat."}, {"label": "情態動詞", "body": "skal、vil、kan、må、bør 後面 → 直接原形：Jeg vil lage mat."}, {"label": "常見錯誤", "body": "Han skal å spise ✗。要說 Han skal spise。"}, {"label": "情態動詞 + 地點", "body": "要去某處時可以省掉動詞：Jeg skal på konsert.（我要去演唱會。）Vi må hjem.（我們得回家了。）"}], "q1": "哪種動詞後面加 å？哪種不加？情態動詞什麼時候可以不接動詞？", "q2": "寫句子時怎麼判斷要不要加 å？你會先看哪個字？"}, {"id": "C10", "type": "procedure", "title": "每個成分站哪裡", "lead": "動詞第 2；主詞第 1 或第 3；時間詞句首或句尾；å + 動詞排最後。", "points": [{"label": "第一個動詞", "body": "永遠第 2 位。"}, {"label": "主詞", "body": "通常第 1 位。句首被時間詞佔走就退到第 3 位。"}, {"label": "時間詞", "body": "放句首（會倒裝）或放句尾（不倒裝）都可以。"}, {"label": "第二個動詞", "body": "å + 原形，排在主詞和第一個動詞後面。"}], "q1": "句子裡四種成分各可以站哪？", "q2": "I dag prøver de å bestille på norsk（今天他們試著用挪威語點餐），每個字各在第幾位？"}, {"id": "C11", "type": "concept", "title": "講未來的三種說法", "lead": "現在式加時間詞、skal、kommer til å，三種都行。", "points": [{"label": "現在式 + 時間", "body": "最簡單：Vi reiser i morgen.（我們明天出發。）"}, {"label": "skal + 原形", "body": "有計畫的事：Vi skal reise til Berlin i juni.（我們六月要去柏林。）"}, {"label": "kommer til å + 原形", "body": "預料會發生、通常不是自己安排的：Jeg kommer til å savne deg.（我會想你的。）"}], "q1": "三種講未來的句型是什麼？", "q2": "「已經訂好的旅行」和「我大概會很累」，各適合用哪一種？"}, {"id": "C12", "type": "application", "title": "練習：排一句有情態動詞的句子", "lead": "用 I morgen 開頭，把 må、du、komme、presis 排對。", "points": [{"label": "題目", "body": "字卡：må、I morgen、du、presis（準時）、komme（來）。"}, {"label": "要求", "body": "以 I morgen 開頭，排出一句完整的話。"}, {"label": "提醒", "body": "有情態動詞 må，後面接原形 komme，中間不加 å。"}, {"label": "用到的規則", "body": "V2、倒裝、情態動詞不加 å。"}], "q1": "這句的句首是什麼？用到哪些規則？", "q2": "你排出來的句子裡，må、du、komme 為什麼是這個順序？每一步靠哪條規則？"}]}, {"id": "02-pronomen", "short": "人稱代名詞", "description": "我你他、受詞形、反身代名詞", "cards": [{"id": "C1", "type": "concept", "title": "主詞用的代名詞", "lead": "jeg 我、du 你、han 他、hun 她、den/det 它、vi 我們、dere 你們、de 他們。", "points": [{"label": "單數", "body": "jeg（我）、du（你）、han（他）、hun（她）。"}, {"label": "「它」有兩個", "body": "den 和 det 都是「它」，指東西或動物，看名詞性別選。"}, {"label": "複數", "body": "vi（我們）、dere（你們）、de（他們／它們）。"}], "q1": "九個主詞代名詞各是什麼意思？", "q2": "講一隻貓的時候，為什麼不用 han 或 hun？"}, {"id": "C2", "type": "concept", "title": "den 還是 det", "lead": "陽性、陰性名詞用 den；中性名詞用 det。", "points": [{"label": "規則", "body": "看那個東西的名詞是 en 還是 et：en 開頭用 den，et 開頭用 det。"}, {"label": "den 的例子", "body": "en katt（貓）→ Den spiser.（牠在吃。）en skillingsbolle（肉桂捲）→ Den koster 35 kroner."}, {"label": "det 的例子", "body": "et troll（山妖）→ Det spiser. et rundstykke（小圓麵包）→ Det koster 13 kroner."}, {"label": "講人", "body": "人就用 han 或 hun：Ulrik har en bror. Han heter Henrik."}], "q1": "選 den 或 det 要看什麼？講人用什麼？", "q2": "et eple（蘋果）要用 den 還是 det？你是看哪個字決定的？"}, {"id": "C3", "type": "concept", "title": "受詞用的代名詞", "lead": "當受詞時 jeg 變 meg、du 變 deg、hun 變 henne、vi 變 oss、de 變 dem。", "points": [{"label": "我、你", "body": "jeg → meg，du → deg。"}, {"label": "他、她", "body": "han → ham（也可以寫 han），hun → henne。"}, {"label": "它", "body": "den、det 不變。"}, {"label": "複數", "body": "vi → oss，dere 不變，de → dem（也可以寫 de）。"}], "q1": "每個代名詞當受詞時變成什麼？", "q2": "哪些代名詞當受詞完全不用變？哪些有兩種寫法？"}, {"id": "C4", "type": "procedure", "title": "什麼時候用受詞形", "lead": "不是主詞就用受詞形，包括動詞後面和介系詞後面。", "points": [{"label": "主詞形", "body": "當主詞：Jeg bor på Hatleberg.（我住在 Hatleberg。）"}, {"label": "動詞後面", "body": "當受詞：Vil du besøke meg?（你要來找我嗎？）"}, {"label": "介系詞後面", "body": "也用受詞形：Hvordan går det med deg?（你好嗎？）"}, {"label": "一句裡兩種都有", "body": "Kjenner du henne?（你認識她嗎？）du 是主詞，henne 是受詞。"}], "q1": "什麼時候用主詞形、什麼時候用受詞形？各舉一例。", "q2": "Kan du hjelpe meg?（你可以幫我嗎？）為什麼是 du 和 meg，不是 deg 和 jeg？"}, {"id": "C5", "type": "concept", "title": "反身代名詞長什麼樣", "lead": "跟受詞形幾乎一樣，只有第三人稱全部變成 seg。", "points": [{"label": "我、你、我們、你們", "body": "meg、deg、oss、dere，和受詞形一樣。"}, {"label": "他、她、它、他們", "body": "全部都是 seg。"}, {"label": "例句", "body": "Jeg vasker meg.（我洗澡。）Du vasker deg. De vasker seg."}], "q1": "每個人稱的反身代名詞是什麼？", "q2": "為什麼只有第三人稱要另外記 seg？其他人稱為什麼不用背？"}, {"id": "C6", "type": "comparison", "title": "什麼時候用反身", "lead": "動作做在自己身上就用反身；做在別人身上就用一般受詞。", "points": [{"label": "條件", "body": "主詞和受詞是同一個人（或同一隻動物）。"}, {"label": "用反身", "body": "Katten vasker seg.（貓在洗自己。）"}, {"label": "不用反身", "body": "Jeg vasker henne.（我幫她洗。）主詞是我、受詞是她，不同人。"}, {"label": "第三人稱最容易搞混", "body": "Han vasker seg（他洗自己）和 Han vasker ham（他幫另一個男生洗）意思不同。"}], "q1": "什麼情況用反身代名詞？不用的時候改成什麼？", "q2": "「她幫自己洗」和「她幫另一個女生洗」，受詞各用哪個字？"}, {"id": "C7", "type": "concept", "title": "早晚作息的反身動詞", "lead": "穿衣、化妝、刮鬍子、上床睡覺都是反身動詞，seg 要跟著主詞換。", "points": [{"label": "å kle på seg", "body": "穿衣服：Han kler på seg etter frokost.（他早餐後穿衣服。）"}, {"label": "å sminke seg", "body": "化妝：Sminker du deg ofte?（你常化妝嗎？）"}, {"label": "å barbere seg", "body": "刮鬍子。"}, {"label": "å legge seg", "body": "上床睡覺：Han legger seg sent.（他很晚睡。）"}, {"label": "å ha på seg", "body": "身上穿著、戴著。"}], "q1": "這五個動詞各是什麼意思？", "q2": "講你自己早上的準備時，這些動詞裡的 seg 要換成什麼？"}, {"id": "C8", "type": "concept", "title": "心情類的反身動詞", "lead": "期待、怕、玩得開心、專心、結婚，都要帶反身代名詞。", "points": [{"label": "å glede seg til", "body": "期待：Jeg gleder meg til kvelden.（我好期待今晚。）"}, {"label": "å grue seg til", "body": "很不想面對、害怕：和 glede seg 相反。"}, {"label": "å kose seg", "body": "玩得很開心、很享受：De koser seg på konserten."}, {"label": "å konsentrere seg", "body": "專心：Vi konsentrerer oss."}, {"label": "å gifte seg", "body": "結婚：Skal du gifte deg allerede?（你這麼快就要結婚了？）"}], "q1": "這五個動詞各是什麼意思？", "q2": "glede seg 和 grue seg 各適合什麼情境？用 jeg 開頭時 seg 換成什麼？"}, {"id": "C9", "type": "concept", "title": "動作類的反身動詞", "lead": "替自己做、隨身帶、趕快、打扮，seg 一樣跟主詞換。", "points": [{"label": "å lage seg", "body": "替自己做：Jeg lager meg en stor matpakke.（我幫自己做一大份便當。）"}, {"label": "å ta med seg", "body": "隨身帶：Tar dere med dere paraply?（你們有帶傘嗎？）"}, {"label": "å skynde seg", "body": "趕快：Hun skynder seg til bybanestoppet.（她趕去輕軌站。）"}, {"label": "å fikse seg", "body": "打扮一下：Han fikser seg før konserten."}], "q1": "這四個動詞各是什麼意思？", "q2": "Tar dere med dere paraply? 這句為什麼出現兩次 dere？各是什麼角色？"}, {"id": "C10", "type": "procedure", "title": "三種形式一次對照", "lead": "第一、二人稱受詞形＝反身形；第三人稱受詞形各不同、反身形全是 seg。", "points": [{"label": "我、你、我們、你們", "body": "受詞和反身一樣：meg、deg、oss、dere。"}, {"label": "他、她", "body": "受詞是 ham、henne；反身是 seg。"}, {"label": "他們", "body": "受詞是 dem；反身是 seg。"}, {"label": "它", "body": "主詞和受詞都是 den/det；反身是 seg。"}], "q1": "各人稱的主詞形、受詞形、反身形有什麼異同？", "q2": "為什麼第三人稱比第一、二人稱更要分清楚受詞和反身？"}]}, {"id": "03-substantiv-possessiv-adjektiv", "short": "名詞、所有格、形容詞", "description": "en/et、我的你的、大的小的", "cards": [{"id": "C1", "type": "concept", "title": "名詞有三種性別", "lead": "看冠詞：en 陽性、ei 陰性、et 中性。卑爾根只用 en 和 et。", "points": [{"label": "陽性 en", "body": "en banan（香蕉）、en student（學生）。"}, {"label": "陰性 ei", "body": "ei pære（梨子）。"}, {"label": "中性 et", "body": "et eple（蘋果）、et kurs（課程）。"}, {"label": "卑爾根方言", "body": "卑爾根沒有陰性，陰性名詞也用 en：en pære。"}], "q1": "三種性別各用哪個冠詞？卑爾根方言有什麼不同？", "q2": "在卑爾根聽到 en pære，為什麼不算錯？"}, {"id": "C2", "type": "concept", "title": "en 名詞的四種形式", "lead": "一根香蕉、那根香蕉、幾根香蕉、那些香蕉。", "points": [{"label": "一根", "body": "en banan（陰性 ei pære）。"}, {"label": "那根（限定）", "body": "字尾加 -en：bananen。陰性加 -a：pæra。"}, {"label": "幾根（複數）", "body": "加 -er：bananer、pærer。"}, {"label": "那些（複數限定）", "body": "加 -ene：bananene、pærene。"}], "q1": "en 名詞四種形式的字尾是什麼？", "q2": "陰性和陽性名詞的變化，只有哪一個形式不一樣？"}, {"id": "C3", "type": "concept", "title": "et 名詞的四種形式", "lead": "一顆蘋果、那顆蘋果、幾顆蘋果、那些蘋果。", "points": [{"label": "一顆", "body": "et eple、et vindu（窗戶）。"}, {"label": "那顆（限定）", "body": "加 -t 或 -et：eplet、vinduet。"}, {"label": "幾顆（複數）", "body": "加 -er：epler、vinduer。"}, {"label": "那些（複數限定）", "body": "加 -ene：eplene、vinduene。"}], "q1": "et 名詞四種形式的字尾是什麼？", "q2": "看到 vinduene，怎麼一步步推回 et vindu？"}, {"id": "C4", "type": "concept", "title": "複數不變的 et 名詞", "lead": "單音節的 et 名詞，複數不加字尾：et kurs → to kurs。", "points": [{"label": "哪些字", "body": "et bær（莓果）、et kurs（課）、et glass（杯子）這種短的 et 名詞。"}, {"label": "那個（限定）", "body": "照常加 -et：bæret、kurset。"}, {"label": "幾個（複數）", "body": "不加字尾：to kurs、mange bær。"}, {"label": "那些（複數限定）", "body": "照常加 -ene：bærene、alle kursene。"}], "q1": "這類名詞四種形式是什麼？特別的是哪一個？", "q2": "聽到 to kurs，怎麼知道是複數？"}, {"id": "C5", "type": "concept", "title": "我的、你的、他的", "lead": "min/mitt/mine 和 din/ditt/dine 會變；hans、hennes、deres 不變。", "points": [{"label": "我的、你的", "body": "min、mitt、mine／din、ditt、dine。跟著名詞是 en、et 還是複數變。"}, {"label": "他的、她的", "body": "hans、hennes，怎麼接都不變。"}, {"label": "我們的", "body": "vår、vårt、våre，一樣會變。"}, {"label": "你們的、他們的", "body": "都是 deres，不變。"}], "q1": "各人稱的所有格是什麼？哪些會變化？", "q2": "同樣是「我的」，stolen（椅子）、huset（房子）、foreldrene（父母）後面為什麼接的字不一樣？"}, {"id": "C6", "type": "procedure", "title": "所有格放前面還是後面", "lead": "放後面名詞要加限定字尾（rommet mitt）；放前面名詞用原形（mitt rom）。", "points": [{"label": "放後面（最常用）", "body": "名詞變限定形：rommet mitt（我的房間）、maten min（我的食物）。"}, {"label": "放前面（強調）", "body": "名詞用原形：mitt rom、min mat。"}, {"label": "什麼時候放前面", "body": "強調「是我的、不是你的」：Det er mitt problem.（那是我的問題。）"}], "q1": "所有格放前後，名詞各用什麼形式？什麼時候放前面？", "q2": "「這是我的食物」可以說 maten min 也可以說 min mat，名詞怎麼跟著變？"}, {"id": "C7", "type": "concept", "title": "形容詞的基本變化", "lead": "en 名詞不變、et 名詞加 -t、複數加 -e。", "points": [{"label": "en 名詞", "body": "原形：en stor leilighet（一間大公寓）、Leiligheten er stor."}, {"label": "et 名詞", "body": "加 -t：et stort rom（一個大房間）、Rommet er stort."}, {"label": "複數", "body": "加 -e：store vinduer（大窗戶）、Vinduene er store."}], "q1": "形容詞三種情況的字尾是什麼？", "q2": "Huset er stort 的 stort 為什麼要加 -t？"}, {"id": "C8", "type": "concept", "title": "三個不規則形容詞", "lead": "ny 新、gammel 舊、liten 小，變法要另外記。", "points": [{"label": "ny（新）", "body": "et nytt rom、nye vinduer。中性要兩個 t。"}, {"label": "gammel（舊）", "body": "et gammelt rom、gamle vinduer。複數少一個 m 和 e。"}, {"label": "liten（小）", "body": "et lite rom、små vinduer。複數整個換成 små。"}], "q1": "這三個形容詞的中性和複數是什麼？", "q2": "liten 的變化跟一般規則比，哪裡最特別？"}, {"id": "C9", "type": "concept", "title": "顏色也是形容詞", "lead": "大多數顏色照規則變；rosa、lilla 完全不變。", "points": [{"label": "一般顏色", "body": "rød 紅、gul 黃：et rødt hus、gule gardiner（黃窗簾）。"}, {"label": "grønn 綠", "body": "et grønt bord、grønne planter。中性只剩一個 n。"}, {"label": "blå 藍、hvit 白", "body": "中性 blått、hvitt；複數 blå(e)、hvite。"}, {"label": "rosa 粉、lilla 紫", "body": "-a 結尾的顏色不變：rosa gardiner、et lilla hus。"}], "q1": "顏色形容詞怎麼變？哪些不變？", "q2": "en rosa leilighet 變成 et rosa kjøkken，形容詞為什麼不用改？"}, {"id": "C10", "type": "concept", "title": "中性不加 -t 的形容詞", "lead": "-ig 結尾和 norsk 這類，中性不加 -t。", "points": [{"label": "-ig 結尾", "body": "et koselig hus（溫馨的房子）、et hyggelig rom。不加 t。"}, {"label": "norsk", "body": "et norsk måltid（一頓挪威餐）。不加 t。"}, {"label": "對照", "body": "falsk（假的）要加：et falskt smil（假笑）。"}], "q1": "哪些形容詞中性不加 -t？舉一個要加的對照。", "q2": "寫 et hyggelig rom 時，hyggelig 為什麼不用加 -t？"}, {"id": "C11", "type": "procedure", "title": "形容詞要配合名詞", "lead": "先看名詞是 en 還是 et，再看單數還是複數，形容詞跟著變。", "points": [{"label": "第一步看性別", "body": "et 名詞單數 → 加 -t。"}, {"label": "第二步看數量", "body": "複數 → 加 -e，不管 en 還是 et。"}, {"label": "放哪裡都要配合", "body": "放名詞前面（en stor leilighet）或 er 後面（Leiligheten er stor）都一樣。"}], "q1": "形容詞變化要看名詞的哪兩件事？", "q2": "Vinduene er ___（ny），你依序要判斷什麼？填什麼？"}, {"id": "C12", "type": "application", "title": "練習：用所有格和形容詞說「我的房間很大」", "lead": "rom 是 et 名詞，所有格放後面，形容詞配中性。", "points": [{"label": "題目", "body": "跟同學介紹房間，rom 是 et rom。"}, {"label": "要說的", "body": "「我的房間很大」，用 min 和 stor。"}, {"label": "條件", "body": "所有格放名詞後面，用 er 連接。"}, {"label": "會用到", "body": "min/mitt/mine 的變化、形容詞中性加 -t。"}], "q1": "這句要用哪個所有格、形容詞變成什麼？", "q2": "你寫出的句子裡，rom、所有格、stor 各用了什麼形式？為什麼？"}]}, {"id": "04-tid-og-sted", "short": "時間與地點", "description": "日期、på/i/om、東西在哪裡", "cards": [{"id": "C1", "type": "concept", "title": "星期、季節、小寫", "lead": "星期和月份都小寫；週六加週日叫 helg。", "points": [{"label": "星期", "body": "mandag、tirsdag、onsdag、torsdag、fredag、lørdag、søndag。"}, {"label": "週末", "body": "lørdag + søndag = helg。"}, {"label": "季節", "body": "vår 春（3–5 月）、sommer 夏（6–8 月）、høst 秋（9–11 月）、vinter 冬（12–2 月）。"}, {"label": "小寫", "body": "星期和月份開頭都小寫：Det er mandag i dag."}], "q1": "七個星期、四個季節怎麼說？寫的時候注意什麼？", "q2": "十月的某個星期六，是哪個季節、算不算 helg？寫下來要注意什麼？"}, {"id": "C2", "type": "concept", "title": "星期用 på，月份用 i", "lead": "på mandag（星期一）、i januar（一月）、i helgen（週末）。", "points": [{"label": "星期 → på", "body": "på mandag（這個星期一）。每週固定的事用複數：på tirsdager（每個星期二）。"}, {"label": "月份 → i", "body": "i januar。Jeg er født i mai.（我五月生。）"}, {"label": "週末 → i", "body": "i helgen（這個週末）、i helgene（每個週末）。"}], "q1": "星期、月份、週末前面各用什麼介系詞？", "q2": "på mandag 和 på mandager 差在哪？"}, {"id": "C3", "type": "comparison", "title": "om 還是 i：重複的用 om，單次的用 i", "lead": "每天早上 om morgenen；今天晚上 i kveld。", "points": [{"label": "每次都會發生", "body": "用 om + 限定形：om morgenen（每天早上）、om vinteren（每年冬天）。"}, {"label": "某一次", "body": "用 i：i kveld（今晚）、i høst（今年秋天）。"}, {"label": "對照", "body": "Om kvelden pleier jeg å gå ut.（我晚上通常會出門。）I kveld skal jeg se en film.（今晚我要看電影。）"}], "q1": "om 和 i 各用在哪種時間？om 後面名詞是什麼形式？", "q2": "Om høsten liker jeg å lese 和 I høst skal jeg på biltur，為什麼介系詞不一樣？"}, {"id": "C4", "type": "concept", "title": "i 開頭的時間詞", "lead": "昨天、今天、明天、今晚，和「持續多久」都用 i。", "points": [{"label": "前後幾天", "body": "i forgårs 前天、i går 昨天、i dag 今天、i morgen 明天、i overmorgen 後天。"}, {"label": "今天的各時段", "body": "i morges 今天早上、i formiddag 今天上午、i ettermiddag 今天下午、i kveld 今晚、i natt 今晚半夜。"}, {"label": "持續多久", "body": "i + 時間長度：Jeg leste i to timer.（我讀了兩小時。）"}], "q1": "i 開頭的日子和時段怎麼說？i 還能表示什麼？", "q2": "i to timer 的 i 和 i kveld 的 i，意思差在哪？"}, {"id": "C5", "type": "concept", "title": "第一到第十", "lead": "日期和樓層要用序數：første、andre、tredje…", "points": [{"label": "1–3", "body": "første、andre、tredje。"}, {"label": "4–6", "body": "fjerde、femte、sjette。"}, {"label": "7–10", "body": "syvende（或 sjuende）、åttende、niende、tiende。"}, {"label": "用在哪", "body": "日期、樓層：Stephanie bor i 4. etasje.（她住四樓，唸 fjerde。）"}], "q1": "1 到 10 的序數是什麼？用在哪？", "q2": "「我住三樓」要用 tre 還是 tredje？為什麼？"}, {"id": "C6", "type": "concept", "title": "第十一到第三十", "lead": "大多是數字加 -de，幾個唸法要注意。", "points": [{"label": "11–13", "body": "ellevte、tolvte、trettende。tolvte 唸 /tållte/。"}, {"label": "14–19", "body": "數字加 -de：fjortende、femtende、attende、nittende。"}, {"label": "要注意的唸法", "body": "sekstende 唸 /seistene/，syttende 唸 /søttene/。"}, {"label": "20 以上", "body": "tjuende（20）、tjueførste（21）、trettiende（30）。"}], "q1": "11 到 30 的序數有什麼規律？哪幾個唸法特別？", "q2": "看到 18.，你怎麼推出它的序數？"}, {"id": "C7", "type": "procedure", "title": "日期和年份怎麼唸", "lead": "先唸日（序數），再唸月名或 i + 月的序數；年份兩兩一組。", "points": [{"label": "先唸日", "body": "24.10 先唸 tjuefjerde。"}, {"label": "再唸月", "body": "說月名 oktober，或說 i tiende（第十個月）。"}, {"label": "年份", "body": "1998 唸 nitten-nittiåtte（19-98）。"}, {"label": "問生日", "body": "Når har du bursdag?（你生日幾號？）Jeg er født første januar."}], "q1": "日期的兩種唸法是什麼？年份怎麼唸？", "q2": "日期第二種唸法的 i 後面接的是什麼？為什麼要用序數？"}, {"id": "C8", "type": "concept", "title": "東西在哪裡", "lead": "over 上、under 下、foran 前、bak 後、ved siden av 旁邊。", "points": [{"label": "上下", "body": "over（上方）、under（下方）：Katten er under bordet.（貓在桌子下。）"}, {"label": "前後旁", "body": "foran（前面）、bak（後面）、ved siden av（旁邊）。"}, {"label": "牆、地、天花板", "body": "på veggen（牆上）、på gulvet（地上）、i taket（天花板上）。"}], "q1": "這些位置介系詞各是什麼意思？", "q2": "「貓在桌子底下、書在床旁邊」各用哪個介系詞？"}, {"id": "C9", "type": "concept", "title": "地名前面用 i 還是 på", "lead": "國家、大城市、沿海城市用 i；島、山、小地方用 på。", "points": [{"label": "用 i", "body": "i Norge、i Bergen、i Oslo、i Taiwan。國家和城市。"}, {"label": "用 på", "body": "på Osterøy（島）、på fjellet（山上）、小地方。"}, {"label": "城裡的區域", "body": "på Hatleberg、på Fantoft。"}], "q1": "哪些地名用 i？哪些用 på？", "q2": "「我來自 Bergen 但住在 Osterøy」，兩個地名前的介系詞為什麼不同？"}, {"id": "C10", "type": "concept", "title": "躺著、站著、掛著", "lead": "描述東西在哪時，可以用 er，也可以更具體說 ligger、står、henger。", "points": [{"label": "er", "body": "最簡單：Det er et kjøleskap på kjøkkenet.（廚房有冰箱。）"}, {"label": "ligger", "body": "平放的東西：Det ligger et teppe på gulvet.（地上有地毯。）"}, {"label": "står", "body": "直立的東西：Det står en seng på soverommet.（臥室有張床。）"}, {"label": "henger", "body": "掛著的東西：Det henger et bilde på veggen.（牆上掛著一幅畫。）"}], "q1": "四個位置動詞各適合什麼東西？", "q2": "書桌上的筆電和牆上的海報，各選哪個動詞？"}, {"id": "C11", "type": "procedure", "title": "「有一個…」的 det 句", "lead": "介紹新東西時，句子用 det 開頭；地點放句首時 det 跟在動詞後。", "points": [{"label": "普通句", "body": "En hund ligger i sengen.（一隻狗躺在床上。）"}, {"label": "det 句（更自然）", "body": "Det ligger en hund i sengen. 像英文 There is…"}, {"label": "地點放句首", "body": "I sengen ligger det en hund. det 跑到動詞後面。"}, {"label": "常見錯誤", "body": "På kjøkkenet er et kjøleskap ✗，det 不能省。"}], "q1": "同一件事的三種說法是什麼？倒裝時最常犯什麼錯？", "q2": "Et kontor er i tredje etasje 改成 I tredje etasje 開頭，det 放哪？為什麼？"}, {"id": "C12", "type": "application", "title": "練習：說「牆上掛著一幅畫」", "lead": "用 På veggen 開頭，配 henger 和 det。", "points": [{"label": "題目", "body": "描述你的房間，牆上有一幅畫。bilde 是 et 名詞。"}, {"label": "要說的", "body": "以 På veggen 開頭，說牆上掛著一幅畫。"}, {"label": "條件", "body": "用 det 句的倒裝，動詞在第 2 位。"}, {"label": "會用到", "body": "er / ligger / står / henger 和冠詞 et。"}], "q1": "這句的句首、句型、可選的動詞是什麼？", "q2": "你寫的句子為什麼選那個動詞？det 為什麼放那裡？"}, {"id": "C13", "type": "concept", "title": "先、然後、最後", "lead": "først → så / etterpå / deretter → til slutt，排一天的順序。", "points": [{"label": "首先", "body": "først：Først står jeg opp.（我先起床。）"}, {"label": "接著", "body": "så、etterpå、deretter 三個都是「然後」。"}, {"label": "最後", "body": "til slutt：Til slutt går vi hjem.（最後我們回家。）"}, {"label": "語序", "body": "這些字放句首要倒裝：Etterpå spiser jeg frokost."}], "q1": "描述一天順序的字有哪些？", "q2": "用 Først 開頭講起床，主詞和動詞順序會怎樣？"}, {"id": "C14", "type": "concept", "title": "多常做：頻率副詞", "lead": "alltid 總是 → ofte 常常 → noen ganger 有時 → sjelden 很少 → aldri 從不。", "points": [{"label": "高頻", "body": "alltid（總是）、vanligvis（通常）、ofte（常常）。"}, {"label": "中頻", "body": "noen ganger、av og til（有時候）。"}, {"label": "低頻", "body": "sjelden（很少）、nesten aldri（幾乎從不）。"}, {"label": "pleier å", "body": "「我通常會…」：Jeg pleier å drikke kaffe."}], "q1": "頻率副詞由高到低怎麼排？", "q2": "Jeg drikker vanligvis kaffe 和 Jeg pleier å drikke kaffe，結構差在哪？"}]}, {"id": "05-sterke-verb", "short": "強變化動詞", "description": "59 個動詞的原形與現在式", "cards": [{"id": "C1", "type": "concept", "title": "最常用的五個不規則動詞", "lead": "左邊原形，右邊現在式和意思。", "points": [{"label": "å gjøre", "body": "gjør　做（to do）"}, {"label": "å si", "body": "sier　說（to say）"}, {"label": "å spørre", "body": "spør　問（to ask）"}, {"label": "å vite", "body": "vet　知道（to know）"}, {"label": "å være", "body": "er　是、在（to be）"}], "q1": "這幾個動詞的現在式和意思是什麼？", "q2": "這五個動詞的現在式和一般「原形加 -r」的規則比起來，各有什麼不一樣？"}, {"id": "C2", "type": "concept", "title": "情態動詞的原形", "lead": "左邊原形，右邊現在式和意思。", "points": [{"label": "å kunne", "body": "kan　能夠（can）"}, {"label": "å måtte", "body": "må　必須（must）"}, {"label": "å skulle", "body": "skal　將要、打算（will）"}, {"label": "å ville", "body": "vil　想要（want）"}], "q1": "這幾個動詞的現在式和意思是什麼？", "q2": "這四個動詞的現在式有什麼共同特徵，和一般動詞的 -r 規則有什麼不同？"}, {"id": "C3", "type": "concept", "title": "移動", "lead": "左邊原形，右邊現在式和意思。", "points": [{"label": "å gå", "body": "går　走、去（to go/walk）"}, {"label": "å komme", "body": "kommer　來（to come）"}, {"label": "å dra", "body": "drar　出發、前往（to go/move）"}, {"label": "å løpe", "body": "løper　跑（to run）"}, {"label": "å fly", "body": "flyr　飛（to fly）"}], "q1": "這幾個動詞的現在式和意思是什麼？", "q2": "gå、dra、løpe 都跟移動有關，意思差在哪裡，並用其中一個造一句現在式句子？"}, {"id": "C4", "type": "concept", "title": "躺、坐、站、放", "lead": "左邊原形，右邊現在式和意思。", "points": [{"label": "å ligge", "body": "ligger　躺、平放著（to lie）"}, {"label": "å legge", "body": "legger　放下、使躺下（to lay）"}, {"label": "å sitte", "body": "sitter　坐著（to sit）"}, {"label": "å sette", "body": "setter　放置（to put）"}, {"label": "å stå", "body": "står　站著（to stand）"}], "q1": "這幾個動詞的現在式和意思是什麼？", "q2": "ligge 和 legge、sitte 和 sette 這兩組，每組的差別是什麼？"}, {"id": "C5", "type": "concept", "title": "掉落與破壞", "lead": "左邊原形，右邊現在式和意思。", "points": [{"label": "å falle", "body": "faller　掉落、跌倒（to fall）"}, {"label": "å dette", "body": "detter　跌倒、摔一跤（to fall over）"}, {"label": "å brekke", "body": "brekker　弄斷、打破（to break）"}, {"label": "å brenne", "body": "brenner　燃燒（to burn）"}, {"label": "å slå", "body": "slår　打、擊（to hit）"}], "q1": "這幾個動詞的現在式和意思是什麼？", "q2": "falle 和 dette 都跟跌倒有關，你會怎麼各用現在式造一句描述在雨天的 Bergen 走路？"}, {"id": "C6", "type": "concept", "title": "給與拿", "lead": "左邊原形，右邊現在式和意思。", "points": [{"label": "å gi", "body": "gir　給（to give）"}, {"label": "å få", "body": "får　得到（to get）"}, {"label": "å ta", "body": "tar　拿、取（to take）"}, {"label": "å bringe", "body": "bringer　帶來（to bring）"}, {"label": "å bære", "body": "bærer　搬、提著（to carry）"}], "q1": "這幾個動詞的現在式和意思是什麼？", "q2": "gi、få、ta 三個動詞的東西移動方向有什麼不同？"}, {"id": "C7", "type": "concept", "title": "說與寫", "lead": "左邊原形，右邊現在式和意思。", "points": [{"label": "å fortelle", "body": "forteller　講述、告訴（to tell）"}, {"label": "å skrive", "body": "skriver　寫（to write）"}, {"label": "å be", "body": "ber　請求（to request）"}, {"label": "å hete", "body": "heter　名叫（to be called）"}, {"label": "å gjelde", "body": "gjelder　關於、適用於（to be about）"}], "q1": "這幾個動詞的現在式和意思是什麼？", "q2": "挑兩個動詞，各用現在式寫一句跟你在 NHH 上課有關的句子，並說明你為什麼這樣選？"}, {"id": "C8", "type": "concept", "title": "感官與情緒", "lead": "左邊原形，右邊現在式和意思。", "points": [{"label": "å se", "body": "ser　看（to see）"}, {"label": "å le", "body": "ler　笑（to laugh）"}, {"label": "å gråte", "body": "gråter　哭（to cry）"}, {"label": "å synge", "body": "synger　唱歌（to sing）"}, {"label": "å nyte", "body": "nyter　享受（to enjoy）"}], "q1": "這幾個動詞的現在式和意思是什麼？", "q2": "le 和 gråte 意思相反，各用現在式造一句描述朋友的句子？"}, {"id": "C9", "type": "concept", "title": "日常生活", "lead": "左邊原形，右邊現在式和意思。", "points": [{"label": "å drikke", "body": "drikker　喝（to drink）"}, {"label": "å sove", "body": "sover　睡覺（to sleep）"}, {"label": "å fryse", "body": "fryser　冷、結冰（to freeze）"}, {"label": "å bite", "body": "biter　咬（to bite）"}, {"label": "å skjære", "body": "skjærer　切（to cut/chop）"}], "q1": "這幾個動詞的現在式和意思是什麼？", "q2": "描述 Bergen 冬天的夜晚時，你會挑哪兩個動詞，並用現在式造一句？"}, {"id": "C10", "type": "concept", "title": "與人互動", "lead": "左邊原形，右邊現在式和意思。", "points": [{"label": "å hjelpe", "body": "hjelper　幫忙（to help）"}, {"label": "å følge", "body": "følger　跟隨、陪同（to follow）"}, {"label": "å treffe", "body": "treffer　遇見、打中（to hit/to meet）"}, {"label": "å holde", "body": "holder　握著、保持（to hold/to keep）"}, {"label": "å la", "body": "lar　允許、讓（to allow）"}], "q1": "這幾個動詞的現在式和意思是什麼？", "q2": "treffe 有遇見和打中兩種意思，你怎麼從句子判斷是哪一種？"}, {"id": "C11", "type": "concept", "title": "得與失", "lead": "左邊原形，右邊現在式和意思。", "points": [{"label": "å finne", "body": "finner　找到（to find）"}, {"label": "å selge", "body": "selger　賣（to sell）"}, {"label": "å vinne", "body": "vinner　贏（to win）"}, {"label": "å stjele", "body": "stjeler　偷（to steal）"}, {"label": "å stryke", "body": "stryker　沒通過、被當（to fail）"}], "q1": "這幾個動詞的現在式和意思是什麼？", "q2": "stryke 在學生生活裡指什麼，用現在式怎麼說「他沒通過」？"}, {"id": "C12", "type": "concept", "title": "其他常見動詞", "lead": "左邊原形，右邊現在式和意思。", "points": [{"label": "å bli", "body": "blir　變成、留下（to become/to remain）"}, {"label": "å rekke", "body": "rekker　及時趕上（to catch in time）"}, {"label": "å renne", "body": "renner　流動（to flow/to run）"}, {"label": "å gni", "body": "gnir　搓、揉（to rub）"}, {"label": "å kveppe", "body": "kvepper　嚇一跳（to be scared/jumpy）"}], "q1": "這幾個動詞的現在式和意思是什麼？", "q2": "bli 的兩種意思各是什麼，用 jeg 開頭造一句現在式句子？"}]}], "verbs": [{"inf": "å gjøre", "pres": "gjør", "zh": "做", "en": "to do"}, {"inf": "å si", "pres": "sier", "zh": "說", "en": "to say"}, {"inf": "å spørre", "pres": "spør", "zh": "問", "en": "to ask"}, {"inf": "å vite", "pres": "vet", "zh": "知道", "en": "to know"}, {"inf": "å være", "pres": "er", "zh": "是、在", "en": "to be"}, {"inf": "å kunne", "pres": "kan", "zh": "能夠", "en": "can"}, {"inf": "å måtte", "pres": "må", "zh": "必須", "en": "must"}, {"inf": "å skulle", "pres": "skal", "zh": "將要、打算", "en": "will"}, {"inf": "å ville", "pres": "vil", "zh": "想要", "en": "want"}, {"inf": "å gå", "pres": "går", "zh": "走、去", "en": "to go/walk"}, {"inf": "å komme", "pres": "kommer", "zh": "來", "en": "to come"}, {"inf": "å dra", "pres": "drar", "zh": "出發、前往", "en": "to go/move"}, {"inf": "å løpe", "pres": "løper", "zh": "跑", "en": "to run"}, {"inf": "å fly", "pres": "flyr", "zh": "飛", "en": "to fly"}, {"inf": "å ligge", "pres": "ligger", "zh": "躺、平放著", "en": "to lie"}, {"inf": "å legge", "pres": "legger", "zh": "放下、使躺下", "en": "to lay"}, {"inf": "å sitte", "pres": "sitter", "zh": "坐著", "en": "to sit"}, {"inf": "å sette", "pres": "setter", "zh": "放置", "en": "to put"}, {"inf": "å stå", "pres": "står", "zh": "站著", "en": "to stand"}, {"inf": "å falle", "pres": "faller", "zh": "掉落、跌倒", "en": "to fall"}, {"inf": "å dette", "pres": "detter", "zh": "跌倒、摔一跤", "en": "to fall over"}, {"inf": "å brekke", "pres": "brekker", "zh": "弄斷、打破", "en": "to break"}, {"inf": "å brenne", "pres": "brenner", "zh": "燃燒", "en": "to burn"}, {"inf": "å slå", "pres": "slår", "zh": "打、擊", "en": "to hit"}, {"inf": "å gi", "pres": "gir", "zh": "給", "en": "to give"}, {"inf": "å få", "pres": "får", "zh": "得到", "en": "to get"}, {"inf": "å ta", "pres": "tar", "zh": "拿、取", "en": "to take"}, {"inf": "å bringe", "pres": "bringer", "zh": "帶來", "en": "to bring"}, {"inf": "å bære", "pres": "bærer", "zh": "搬、提著", "en": "to carry"}, {"inf": "å fortelle", "pres": "forteller", "zh": "講述、告訴", "en": "to tell"}, {"inf": "å skrive", "pres": "skriver", "zh": "寫", "en": "to write"}, {"inf": "å be", "pres": "ber", "zh": "請求", "en": "to request"}, {"inf": "å hete", "pres": "heter", "zh": "名叫", "en": "to be called"}, {"inf": "å gjelde", "pres": "gjelder", "zh": "關於、適用於", "en": "to be about"}, {"inf": "å se", "pres": "ser", "zh": "看", "en": "to see"}, {"inf": "å le", "pres": "ler", "zh": "笑", "en": "to laugh"}, {"inf": "å gråte", "pres": "gråter", "zh": "哭", "en": "to cry"}, {"inf": "å synge", "pres": "synger", "zh": "唱歌", "en": "to sing"}, {"inf": "å nyte", "pres": "nyter", "zh": "享受", "en": "to enjoy"}, {"inf": "å drikke", "pres": "drikker", "zh": "喝", "en": "to drink"}, {"inf": "å sove", "pres": "sover", "zh": "睡覺", "en": "to sleep"}, {"inf": "å fryse", "pres": "fryser", "zh": "冷、結冰", "en": "to freeze"}, {"inf": "å bite", "pres": "biter", "zh": "咬", "en": "to bite"}, {"inf": "å skjære", "pres": "skjærer", "zh": "切", "en": "to cut/chop"}, {"inf": "å hjelpe", "pres": "hjelper", "zh": "幫忙", "en": "to help"}, {"inf": "å følge", "pres": "følger", "zh": "跟隨、陪同", "en": "to follow"}, {"inf": "å treffe", "pres": "treffer", "zh": "遇見、打中", "en": "to hit/to meet"}, {"inf": "å holde", "pres": "holder", "zh": "握著、保持", "en": "to hold/to keep"}, {"inf": "å la", "pres": "lar", "zh": "允許、讓", "en": "to allow"}, {"inf": "å finne", "pres": "finner", "zh": "找到", "en": "to find"}, {"inf": "å selge", "pres": "selger", "zh": "賣", "en": "to sell"}, {"inf": "å vinne", "pres": "vinner", "zh": "贏", "en": "to win"}, {"inf": "å stjele", "pres": "stjeler", "zh": "偷", "en": "to steal"}, {"inf": "å stryke", "pres": "stryker", "zh": "沒通過、被當", "en": "to fail"}, {"inf": "å bli", "pres": "blir", "zh": "變成、留下", "en": "to become/to remain"}, {"inf": "å rekke", "pres": "rekker", "zh": "及時趕上", "en": "to catch in time"}, {"inf": "å renne", "pres": "renner", "zh": "流動", "en": "to flow/to run"}, {"inf": "å gni", "pres": "gnir", "zh": "搓、揉", "en": "to rub"}, {"inf": "å kveppe", "pres": "kvepper", "zh": "嚇一跳", "en": "to be scared/jumpy"}], "sentences": [{"s": "Han kommer fra Frankrike", "src": "L2"}, {"s": "Hun heter Karoline", "src": "L2"}, {"s": "Nå bor vi i Bergen", "src": "L2"}, {"s": "Norge ligger i Nord-Europa", "src": "L2"}, {"s": "Hun betaler med kort på kaféen", "src": "L5"}, {"s": "Han tar en kaffe latte og et kakestykke", "src": "L5"}, {"s": "De vil gjerne spise lunsj sammen", "src": "L5"}, {"s": "I morgen må du komme presis", "src": "L5"}, {"s": "Neste år skal han flytte til Beijing", "src": "L5"}, {"s": "Vi pleier å lage middag sammen", "src": "L5"}, {"s": "Nå liker han å spise sushi", "src": "L3"}, {"s": "I dag prøver de å bestille på norsk", "src": "L3"}, {"s": "Jeg pleier ikke å drikke kaffe", "src": "L5"}, {"s": "Om kvelden pleier jeg å gå ut med venner", "src": "L6"}, {"s": "I kveld skal jeg se en film", "src": "L6"}, {"s": "På veggen henger det et bilde", "src": "L7"}, {"s": "Det ligger et teppe på gulvet", "src": "L6"}, {"s": "Til frokost drikker jeg kaffe", "src": "L4"}, {"s": "Hun skynder seg til bybanestoppet", "src": "L8"}, {"s": "Jeg gleder meg til kvelden", "src": "L8"}, {"s": "Rommet mitt er stort", "src": "L7"}, {"s": "Vinduene er små", "src": "L7"}, {"s": "Katten er under bordet", "src": "L6"}, {"s": "Vi skal reise til Berlin i juni", "src": "L9"}], "vocab": [{"theme": "打招呼與自我介紹", "words": [{"no": "Hei!", "zh": "嗨！", "note": "", "src": "L1"}, {"no": "God morgen!", "zh": "早安！", "note": "", "src": "L3"}, {"no": "Hvordan går det?", "zh": "你好嗎？", "note": "", "src": "L1"}, {"no": "Det går bra.", "zh": "我很好。", "note": "也可說 Det går fint / Kjempebra", "src": "L2"}, {"no": "Det går greit.", "zh": "還可以。", "note": "", "src": "L2"}, {"no": "Ikke så verst.", "zh": "還不錯。", "note": "", "src": "L3"}, {"no": "Jeg heter …", "zh": "我叫…", "note": "", "src": "L1"}, {"no": "Hyggelig å hilse på deg!", "zh": "很高興認識你！", "note": "回答 I like måte!（我也是）", "src": "L2"}, {"no": "Hva med deg?", "zh": "那你呢？", "note": "也可說 Og du?", "src": "L1"}, {"no": "Jeg også!", "zh": "我也是！", "note": "", "src": "L1"}, {"no": "Ja, gjerne!", "zh": "好啊，樂意！", "note": "", "src": "L1"}, {"no": "Beklager, jeg er opptatt.", "zh": "抱歉，我在忙。", "note": "", "src": "L1"}, {"no": "Nei, dessverre.", "zh": "不行，很可惜。", "note": "", "src": "L3"}, {"no": "Unnskyld, hva sa du?", "zh": "不好意思，你說什麼？", "note": "", "src": "L1"}, {"no": "Kan du gjenta?", "zh": "可以再說一次嗎？", "note": "", "src": "L1"}, {"no": "Hva heter … på norsk?", "zh": "…的挪威語怎麼說？", "note": "", "src": "L1"}, {"no": "Jeg vet ikke.", "zh": "我不知道。", "note": "", "src": "L4"}, {"no": "Takk for praten!", "zh": "謝謝你跟我聊！", "note": "", "src": "L5"}, {"no": "Vi snakkes!", "zh": "再聊！", "note": "", "src": "L5"}, {"no": "Hyggelig å treffe deg.", "zh": "很高興見到你。", "note": "", "src": "L5"}, {"no": "Er det sant?", "zh": "真的嗎？", "note": "", "src": "L10"}, {"no": "Helt enig.", "zh": "完全同意。", "note": "也可說 Det synes jeg også", "src": "L10"}, {"no": "Ikke jeg heller!", "zh": "我也不要／我也沒有！", "note": "", "src": "L10"}, {"no": "Så fint!", "zh": "太好了！", "note": "也可說 Så bra! / Kult!", "src": "L10"}, {"no": "Spennende!", "zh": "好刺激／好有趣！", "note": "", "src": "L10"}, {"no": "Interessant!", "zh": "有意思！", "note": "", "src": "L10"}]}, {"theme": "疑問詞", "words": [{"no": "hva", "zh": "什麼", "note": "", "src": "L1"}, {"no": "hvem", "zh": "誰", "note": "", "src": "L1"}, {"no": "hvor", "zh": "哪裡", "note": "", "src": "L1"}, {"no": "hvordan", "zh": "怎麼樣、如何", "note": "", "src": "L1"}, {"no": "hvorfor", "zh": "為什麼", "note": "回答用 fordi（因為）", "src": "L1"}, {"no": "når", "zh": "什麼時候", "note": "", "src": "L1"}, {"no": "hvilken", "zh": "哪一個（en 名詞）", "note": "hvilket（et）、hvilke（複數）", "src": "L1"}, {"no": "hvor gammel", "zh": "幾歲", "note": "", "src": "L1"}, {"no": "hvor ofte", "zh": "多常", "note": "", "src": "L1"}, {"no": "hvor mange", "zh": "多少（個）", "note": "", "src": "L1"}, {"no": "hva slags", "zh": "哪一種", "note": "", "src": "L6"}, {"no": "fordi", "zh": "因為", "note": "", "src": "L10"}]}, {"theme": "國家、語言、方位", "words": [{"no": "Norge", "zh": "挪威", "note": "norsk 挪威語", "src": "L1"}, {"no": "Taiwan", "zh": "台灣", "note": "", "src": "L1"}, {"no": "England", "zh": "英國", "note": "engelsk 英語", "src": "L1"}, {"no": "Tyskland", "zh": "德國", "note": "tysk 德語", "src": "L2"}, {"no": "Frankrike", "zh": "法國", "note": "fransk 法語", "src": "L1"}, {"no": "Japan", "zh": "日本", "note": "japansk 日語", "src": "L2"}, {"no": "Sverige", "zh": "瑞典", "note": "svensk 瑞典語", "src": "L7"}, {"no": "Spania", "zh": "西班牙", "note": "spansk 西班牙語", "src": "L2"}, {"no": "Italia", "zh": "義大利", "note": "italiensk 義大利語", "src": "L2"}, {"no": "kinesisk", "zh": "中文", "note": "", "src": "L1"}, {"no": "et språk", "zh": "語言", "note": "", "src": "L1"}, {"no": "et land", "zh": "國家", "note": "", "src": "L2"}, {"no": "en by", "zh": "城市", "note": "", "src": "L2"}, {"no": "nord", "zh": "北", "note": "", "src": "L2"}, {"no": "sør", "zh": "南", "note": "", "src": "L2"}, {"no": "øst", "zh": "東", "note": "", "src": "L2"}, {"no": "vest", "zh": "西", "note": "", "src": "L2"}, {"no": "midt i", "zh": "在…中間", "note": "", "src": "L2"}, {"no": "å ligge", "zh": "位於", "note": "ligger：Norge ligger i Nord-Europa", "src": "L2"}]}, {"theme": "學校與日常動詞", "words": [{"no": "å hete", "zh": "叫做", "note": "heter", "src": "L1"}, {"no": "å komme fra", "zh": "來自", "note": "kommer", "src": "L1"}, {"no": "å bo", "zh": "住", "note": "bor", "src": "L1"}, {"no": "å snakke", "zh": "說（語言）", "note": "snakker", "src": "L1"}, {"no": "å studere", "zh": "讀（大學）", "note": "studerer", "src": "L1"}, {"no": "å lære", "zh": "學", "note": "lærer", "src": "L2"}, {"no": "å jobbe", "zh": "工作", "note": "jobber", "src": "L3"}, {"no": "å være", "zh": "是、在", "note": "er", "src": "L2"}, {"no": "å gjøre", "zh": "做", "note": "gjør", "src": "L3"}, {"no": "å si", "zh": "說", "note": "sier", "src": "L3"}, {"no": "å spørre", "zh": "問", "note": "spør", "src": "L3"}, {"no": "å vite", "zh": "知道", "note": "vet", "src": "L3"}, {"no": "å like", "zh": "喜歡", "note": "liker", "src": "L3"}, {"no": "å elske", "zh": "很愛", "note": "elsker", "src": "L3"}, {"no": "å foretrekke", "zh": "比較喜歡", "note": "foretrekker", "src": "L3"}, {"no": "å pleie å", "zh": "習慣、通常會", "note": "pleier", "src": "L3"}, {"no": "å prøve", "zh": "試", "note": "prøver", "src": "L3"}, {"no": "å begynne", "zh": "開始", "note": "begynner", "src": "L3"}, {"no": "å finne", "zh": "找到", "note": "finner", "src": "L3"}, {"no": "å finne på noe", "zh": "找點事做", "note": "", "src": "L3"}, {"no": "å bli", "zh": "變成", "note": "blir", "src": "L3"}, {"no": "å trene", "zh": "運動、訓練", "note": "trener", "src": "L3"}, {"no": "å reise", "zh": "旅行、出發", "note": "reiser", "src": "L3"}, {"no": "å ringe", "zh": "打電話", "note": "ringer", "src": "L3"}, {"no": "å besøke", "zh": "拜訪", "note": "besøker", "src": "L4"}, {"no": "å kjenne", "zh": "認識（人）", "note": "kjenner", "src": "L4"}, {"no": "å hjelpe", "zh": "幫忙", "note": "hjelper", "src": "L4"}, {"no": "å flytte", "zh": "搬家", "note": "flytter", "src": "L5"}, {"no": "å forstå", "zh": "懂", "note": "forstår", "src": "L6"}, {"no": "å stave", "zh": "拼（字）", "note": "staver", "src": "L6"}, {"no": "å dele", "zh": "分享、共用", "note": "deler", "src": "L6"}, {"no": "å tekste", "zh": "傳訊息", "note": "tekster", "src": "L6"}, {"no": "å lese", "zh": "讀", "note": "leser", "src": "L6"}, {"no": "å se en film", "zh": "看電影", "note": "ser", "src": "L3"}, {"no": "å gå på tur", "zh": "去健行、散步", "note": "går", "src": "L3"}, {"no": "å spille", "zh": "玩（球、遊戲、樂器）", "note": "spiller", "src": "L3"}, {"no": "å danse", "zh": "跳舞", "note": "danser", "src": "L9"}, {"no": "å jogge", "zh": "慢跑", "note": "jogger", "src": "L9"}, {"no": "å bade", "zh": "游泳、玩水", "note": "bader", "src": "L8"}, {"no": "å stå på ski", "zh": "滑雪", "note": "står", "src": "L8"}, {"no": "å glede seg til", "zh": "期待", "note": "gleder", "src": "L8"}, {"no": "å savne", "zh": "想念", "note": "savner", "src": "L9"}]}, {"theme": "食物與飲料", "words": [{"no": "sulten", "zh": "餓", "note": "", "src": "L3"}, {"no": "tørst", "zh": "渴", "note": "", "src": "L3"}, {"no": "mat", "zh": "食物", "note": "", "src": "L3"}, {"no": "en frokost", "zh": "早餐", "note": "til frokost 當早餐", "src": "L3"}, {"no": "en lunsj", "zh": "午餐", "note": "", "src": "L3"}, {"no": "en middag", "zh": "晚餐", "note": "", "src": "L3"}, {"no": "kvelds", "zh": "宵夜、晚點心", "note": "", "src": "L3"}, {"no": "et måltid", "zh": "一餐", "note": "", "src": "L7"}, {"no": "en kaffe", "zh": "咖啡", "note": "en kopp kaffe 一杯咖啡", "src": "L1"}, {"no": "en te", "zh": "茶", "note": "", "src": "L5"}, {"no": "melk", "zh": "牛奶", "note": "", "src": "L4"}, {"no": "et brød", "zh": "麵包", "note": "en brødskive 一片麵包", "src": "L4"}, {"no": "et rundstykke", "zh": "小圓麵包", "note": "", "src": "L3"}, {"no": "en skillingsbolle", "zh": "卑爾根肉桂捲", "note": "", "src": "L4"}, {"no": "et kakestykke", "zh": "一塊蛋糕", "note": "", "src": "L5"}, {"no": "en ost", "zh": "起司", "note": "skive med ost 起司三明治", "src": "L5"}, {"no": "en salat", "zh": "沙拉", "note": "", "src": "L4"}, {"no": "fisk", "zh": "魚", "note": "", "src": "L4"}, {"no": "kjøtt", "zh": "肉", "note": "", "src": "L6"}, {"no": "kjøttdeig", "zh": "絞肉", "note": "", "src": "L4"}, {"no": "kjøttkaker", "zh": "挪威肉丸", "note": "", "src": "L4"}, {"no": "pølser", "zh": "香腸", "note": "", "src": "L4"}, {"no": "poteter", "zh": "馬鈴薯", "note": "", "src": "L4"}, {"no": "ris", "zh": "飯", "note": "", "src": "L4"}, {"no": "pasta", "zh": "義大利麵", "note": "", "src": "L5"}, {"no": "en banan", "zh": "香蕉", "note": "", "src": "L4"}, {"no": "et eple", "zh": "蘋果", "note": "", "src": "L4"}, {"no": "ei pære", "zh": "梨子", "note": "", "src": "L4"}, {"no": "et bær", "zh": "莓果", "note": "", "src": "L4"}, {"no": "en is", "zh": "冰淇淋", "note": "", "src": "L5"}, {"no": "øl", "zh": "啤酒", "note": "", "src": "L4"}, {"no": "vin", "zh": "酒", "note": "", "src": "L4"}, {"no": "en matpakke", "zh": "便當、自備午餐", "note": "", "src": "L8"}, {"no": "en oppskrift", "zh": "食譜", "note": "", "src": "L3"}, {"no": "en rett", "zh": "一道菜", "note": "favorittretten min 我最愛的菜", "src": "L3"}, {"no": "tacofredag", "zh": "週五塔可日", "note": "", "src": "L4"}, {"no": "å spise", "zh": "吃", "note": "spiser", "src": "L1"}, {"no": "å drikke", "zh": "喝", "note": "drikker", "src": "L3"}, {"no": "å lage mat", "zh": "做飯", "note": "lager", "src": "L3"}, {"no": "å smake", "zh": "嚐", "note": "smaker", "src": "L3"}, {"no": "å bestille", "zh": "點（餐）", "note": "bestiller", "src": "L3"}, {"no": "å betale", "zh": "付錢", "note": "betaler", "src": "L3"}, {"no": "å handle", "zh": "買東西", "note": "handler", "src": "L4"}, {"no": "å kjøpe", "zh": "買", "note": "kjøper", "src": "L4"}, {"no": "å koste", "zh": "花費、價格是", "note": "Det koster 50 kroner.", "src": "L3"}, {"no": "Hva vil du ha?", "zh": "你要什麼？", "note": "", "src": "L3"}, {"no": "Jeg vil gjerne ha …", "zh": "我想要…", "note": "", "src": "L3"}, {"no": "Skal vi ta en kaffe?", "zh": "要不要喝杯咖啡？", "note": "", "src": "L1"}, {"no": "på butikken", "zh": "在商店", "note": "", "src": "L4"}, {"no": "på kafé", "zh": "在咖啡廳", "note": "", "src": "L3"}, {"no": "et bord", "zh": "桌子", "note": "", "src": "L3"}, {"no": "med kort", "zh": "刷卡", "note": "", "src": "L5"}, {"no": "kroner", "zh": "克朗", "note": "", "src": "L3"}]}, {"theme": "數字", "words": [{"no": "null", "zh": "0", "note": "", "src": "L3"}, {"no": "en / ett", "zh": "1", "note": "", "src": "L6"}, {"no": "to", "zh": "2", "note": "", "src": "L6"}, {"no": "tre", "zh": "3", "note": "", "src": "L6"}, {"no": "fire", "zh": "4", "note": "", "src": "L6"}, {"no": "fem", "zh": "5", "note": "", "src": "L6"}, {"no": "seks", "zh": "6", "note": "", "src": "L6"}, {"no": "sju / syv", "zh": "7", "note": "", "src": "L6"}, {"no": "åtte", "zh": "8", "note": "", "src": "L6"}, {"no": "ni", "zh": "9", "note": "", "src": "L6"}, {"no": "ti", "zh": "10", "note": "", "src": "L6"}, {"no": "elleve", "zh": "11", "note": "", "src": "L6"}, {"no": "tolv", "zh": "12", "note": "唸 /tåll/", "src": "L6"}, {"no": "tretten", "zh": "13", "note": "", "src": "L6"}, {"no": "fjorten", "zh": "14", "note": "", "src": "L6"}, {"no": "femten", "zh": "15", "note": "", "src": "L6"}, {"no": "seksten", "zh": "16", "note": "唸 /seisten/", "src": "L6"}, {"no": "sytten", "zh": "17", "note": "唸 /søtten/", "src": "L6"}, {"no": "atten", "zh": "18", "note": "", "src": "L6"}, {"no": "nitten", "zh": "19", "note": "", "src": "L6"}, {"no": "tjue", "zh": "20", "note": "", "src": "L6"}, {"no": "tjueén", "zh": "21", "note": "", "src": "L6"}, {"no": "tretti", "zh": "30", "note": "", "src": "L6"}, {"no": "hundre", "zh": "100", "note": "", "src": "L5"}, {"no": "tusen", "zh": "1000", "note": "", "src": "L5"}, {"no": "pluss", "zh": "加", "note": "", "src": "L3"}, {"no": "minus", "zh": "減", "note": "", "src": "L3"}, {"no": "ganger", "zh": "乘", "note": "", "src": "L5"}, {"no": "delt på", "zh": "除", "note": "", "src": "L5"}, {"no": "er lik", "zh": "等於", "note": "", "src": "L3"}, {"no": "Hvor gammel er du?", "zh": "你幾歲？", "note": "Jeg er … år gammel.", "src": "L3"}, {"no": "telefonnummer", "zh": "電話號碼", "note": "Hva er telefonnummeret ditt?", "src": "L3"}]}, {"theme": "家與家具", "words": [{"no": "en bolig", "zh": "住處", "note": "", "src": "L6"}, {"no": "en leilighet", "zh": "公寓", "note": "", "src": "L6"}, {"no": "et hus", "zh": "房子", "note": "", "src": "L7"}, {"no": "et rom", "zh": "房間", "note": "eget rom 自己的房間", "src": "L6"}, {"no": "et soverom", "zh": "臥室", "note": "", "src": "L6"}, {"no": "ei stue", "zh": "客廳", "note": "", "src": "L6"}, {"no": "et kjøkken", "zh": "廚房", "note": "felleskjøkken 共用廚房", "src": "L6"}, {"no": "et bad", "zh": "浴室", "note": "", "src": "L6"}, {"no": "en etasje", "zh": "樓層", "note": "i fjerde etasje 在四樓", "src": "L6"}, {"no": "ei trapp", "zh": "樓梯", "note": "", "src": "L6"}, {"no": "et vindu", "zh": "窗戶", "note": "", "src": "L5"}, {"no": "en vegg", "zh": "牆", "note": "", "src": "L6"}, {"no": "et gulv", "zh": "地板", "note": "", "src": "L6"}, {"no": "et tak", "zh": "天花板、屋頂", "note": "", "src": "L10"}, {"no": "ei dør", "zh": "門", "note": "", "src": "L7"}, {"no": "ei seng", "zh": "床", "note": "", "src": "L6"}, {"no": "et skrivebord", "zh": "書桌", "note": "", "src": "L6"}, {"no": "en stol", "zh": "椅子", "note": "", "src": "L7"}, {"no": "en sofa", "zh": "沙發", "note": "", "src": "L7"}, {"no": "et teppe", "zh": "地毯", "note": "", "src": "L6"}, {"no": "et bilde", "zh": "畫、照片", "note": "", "src": "L6"}, {"no": "ei hylle", "zh": "架子", "note": "", "src": "L7"}, {"no": "en gardin", "zh": "窗簾", "note": "", "src": "L7"}, {"no": "et kjøleskap", "zh": "冰箱", "note": "", "src": "L6"}, {"no": "en vase", "zh": "花瓶", "note": "", "src": "L6"}, {"no": "en plante", "zh": "植物", "note": "", "src": "L7"}, {"no": "ei bok", "zh": "書", "note": "複數 bøker", "src": "L7"}, {"no": "en pc", "zh": "電腦", "note": "", "src": "L7"}, {"no": "en romkamerat", "zh": "室友", "note": "", "src": "L6"}, {"no": "bråkete", "zh": "吵", "note": "", "src": "L6"}, {"no": "å henge", "zh": "掛著", "note": "henger", "src": "L6"}, {"no": "å stå", "zh": "立著", "note": "står", "src": "L6"}, {"no": "over", "zh": "在…上方", "note": "", "src": "L6"}, {"no": "under", "zh": "在…下方", "note": "", "src": "L6"}, {"no": "foran", "zh": "在…前面", "note": "", "src": "L7"}, {"no": "bak", "zh": "在…後面", "note": "", "src": "L7"}, {"no": "ved siden av", "zh": "在…旁邊", "note": "", "src": "L7"}, {"no": "Kom inn!", "zh": "請進！", "note": "", "src": "L6"}]}, {"theme": "形容詞與顏色", "words": [{"no": "stor", "zh": "大", "note": "stort / store", "src": "L7"}, {"no": "liten", "zh": "小", "note": "lite / små", "src": "L7"}, {"no": "ny", "zh": "新", "note": "nytt / nye", "src": "L7"}, {"no": "gammel", "zh": "舊、老", "note": "gammelt / gamle", "src": "L7"}, {"no": "pen", "zh": "漂亮", "note": "", "src": "L7"}, {"no": "fin", "zh": "好、不錯", "note": "", "src": "L2"}, {"no": "hyggelig", "zh": "愉快、親切", "note": "g 不發音", "src": "L6"}, {"no": "koselig", "zh": "溫馨、舒適", "note": "", "src": "L6"}, {"no": "romslig", "zh": "寬敞", "note": "", "src": "L6"}, {"no": "rolig", "zh": "安靜、平靜", "note": "", "src": "L6"}, {"no": "ryddig", "zh": "整齊", "note": "", "src": "L6"}, {"no": "viktig", "zh": "重要", "note": "", "src": "L6"}, {"no": "vanskelig", "zh": "困難", "note": "", "src": "L6"}, {"no": "billig", "zh": "便宜", "note": "", "src": "L6"}, {"no": "vanlig", "zh": "普通、平常", "note": "", "src": "L6"}, {"no": "veldig", "zh": "非常", "note": "", "src": "L6"}, {"no": "lykkelig", "zh": "幸福", "note": "", "src": "L6"}, {"no": "heldig", "zh": "幸運", "note": "", "src": "L6"}, {"no": "ferdig", "zh": "完成了", "note": "", "src": "L6"}, {"no": "tidlig", "zh": "早", "note": "", "src": "L6"}, {"no": "sent", "zh": "晚", "note": "", "src": "L8"}, {"no": "snill", "zh": "善良", "note": "", "src": "L10"}, {"no": "glad", "zh": "開心", "note": "", "src": "L10"}, {"no": "høy", "zh": "高", "note": "", "src": "L10"}, {"no": "morsom", "zh": "好笑、有趣", "note": "", "src": "L10"}, {"no": "myk", "zh": "柔軟", "note": "", "src": "L10"}, {"no": "varm", "zh": "溫暖", "note": "", "src": "L10"}, {"no": "tom", "zh": "空的", "note": "", "src": "L7"}, {"no": "åpen", "zh": "開著的", "note": "", "src": "L7"}, {"no": "falsk", "zh": "假的", "note": "", "src": "L10"}, {"no": "rød", "zh": "紅", "note": "", "src": "L7"}, {"no": "gul", "zh": "黃", "note": "", "src": "L7"}, {"no": "grønn", "zh": "綠", "note": "", "src": "L7"}, {"no": "blå", "zh": "藍", "note": "", "src": "L7"}, {"no": "hvit", "zh": "白", "note": "", "src": "L7"}, {"no": "svart", "zh": "黑", "note": "", "src": "L8"}, {"no": "rosa", "zh": "粉紅", "note": "不變化", "src": "L7"}, {"no": "lilla", "zh": "紫", "note": "不變化", "src": "L7"}, {"no": "oransje", "zh": "橘", "note": "", "src": "L7"}, {"no": "lys", "zh": "淺色、亮", "note": "", "src": "L7"}, {"no": "mørk", "zh": "深色、暗", "note": "", "src": "L7"}, {"no": "en farge", "zh": "顏色", "note": "favorittfargen din 你最愛的顏色", "src": "L7"}]}, {"theme": "日期與時間", "words": [{"no": "mandag", "zh": "星期一", "note": "", "src": "L6"}, {"no": "tirsdag", "zh": "星期二", "note": "", "src": "L6"}, {"no": "onsdag", "zh": "星期三", "note": "", "src": "L6"}, {"no": "torsdag", "zh": "星期四", "note": "", "src": "L6"}, {"no": "fredag", "zh": "星期五", "note": "", "src": "L6"}, {"no": "lørdag", "zh": "星期六", "note": "", "src": "L6"}, {"no": "søndag", "zh": "星期日", "note": "", "src": "L6"}, {"no": "ei helg", "zh": "週末", "note": "i helgen", "src": "L6"}, {"no": "en uke", "zh": "星期、週", "note": "en gang i uken 一週一次", "src": "L3"}, {"no": "en dag", "zh": "天", "note": "", "src": "L6"}, {"no": "en måned", "zh": "月", "note": "", "src": "L6"}, {"no": "et år", "zh": "年", "note": "", "src": "L6"}, {"no": "januar", "zh": "一月", "note": "", "src": "L6"}, {"no": "februar", "zh": "二月", "note": "", "src": "L6"}, {"no": "mars", "zh": "三月", "note": "", "src": "L6"}, {"no": "april", "zh": "四月", "note": "", "src": "L6"}, {"no": "mai", "zh": "五月", "note": "", "src": "L6"}, {"no": "juni", "zh": "六月", "note": "", "src": "L6"}, {"no": "juli", "zh": "七月", "note": "", "src": "L6"}, {"no": "august", "zh": "八月", "note": "", "src": "L6"}, {"no": "september", "zh": "九月", "note": "", "src": "L6"}, {"no": "oktober", "zh": "十月", "note": "", "src": "L6"}, {"no": "november", "zh": "十一月", "note": "", "src": "L6"}, {"no": "desember", "zh": "十二月", "note": "", "src": "L6"}, {"no": "en vår", "zh": "春天", "note": "om våren", "src": "L6"}, {"no": "en sommer", "zh": "夏天", "note": "om sommeren", "src": "L6"}, {"no": "en høst", "zh": "秋天", "note": "om høsten", "src": "L6"}, {"no": "en vinter", "zh": "冬天", "note": "om vinteren", "src": "L6"}, {"no": "en bursdag", "zh": "生日", "note": "Når har du bursdag?", "src": "L6"}, {"no": "født", "zh": "出生", "note": "Jeg er født i 2000.", "src": "L6"}, {"no": "en dato", "zh": "日期", "note": "", "src": "L7"}, {"no": "i dag", "zh": "今天", "note": "", "src": "L8"}, {"no": "i går", "zh": "昨天", "note": "", "src": "L8"}, {"no": "i morgen", "zh": "明天", "note": "", "src": "L8"}, {"no": "i forgårs", "zh": "前天", "note": "", "src": "L8"}, {"no": "i overmorgen", "zh": "後天", "note": "", "src": "L8"}, {"no": "i morges", "zh": "今天早上", "note": "", "src": "L8"}, {"no": "i kveld", "zh": "今晚", "note": "", "src": "L8"}, {"no": "i natt", "zh": "今晚（深夜）", "note": "", "src": "L8"}, {"no": "om morgenen", "zh": "早上（每天）", "note": "", "src": "L3"}, {"no": "om formiddagen", "zh": "上午", "note": "", "src": "L9"}, {"no": "om ettermiddagen", "zh": "下午", "note": "", "src": "L9"}, {"no": "om kvelden", "zh": "晚上（每天）", "note": "", "src": "L3"}, {"no": "om natten", "zh": "夜裡", "note": "", "src": "L6"}, {"no": "klokken", "zh": "…點鐘", "note": "Hva er klokken? 幾點了？", "src": "L8"}, {"no": "kvart over", "zh": "…點一刻", "note": "kvart over åtte 8:15", "src": "L8"}, {"no": "en time", "zh": "小時", "note": "i to timer 兩小時", "src": "L8"}, {"no": "senere", "zh": "晚一點", "note": "", "src": "L3"}, {"no": "nå", "zh": "現在", "note": "", "src": "L2"}, {"no": "neste", "zh": "下一個", "note": "neste fredag 下週五", "src": "L3"}, {"no": "presis", "zh": "準時", "note": "", "src": "L5"}, {"no": "først", "zh": "首先", "note": "", "src": "L8"}, {"no": "så", "zh": "然後", "note": "", "src": "L8"}, {"no": "etterpå", "zh": "之後", "note": "", "src": "L8"}, {"no": "deretter", "zh": "接著", "note": "", "src": "L8"}, {"no": "til slutt", "zh": "最後", "note": "", "src": "L8"}, {"no": "før", "zh": "在…之前", "note": "", "src": "L10"}, {"no": "etter", "zh": "在…之後", "note": "", "src": "L8"}]}, {"theme": "多常做：頻率", "words": [{"no": "alltid", "zh": "總是", "note": "", "src": "L5"}, {"no": "vanligvis", "zh": "通常", "note": "", "src": "L5"}, {"no": "ofte", "zh": "常常", "note": "", "src": "L5"}, {"no": "noen ganger", "zh": "有時候", "note": "", "src": "L5"}, {"no": "av og til", "zh": "偶爾", "note": "", "src": "L5"}, {"no": "sjelden", "zh": "很少", "note": "", "src": "L5"}, {"no": "nesten aldri", "zh": "幾乎不", "note": "", "src": "L5"}, {"no": "aldri", "zh": "從不", "note": "", "src": "L8"}, {"no": "hver mandag", "zh": "每個星期一", "note": "", "src": "L3"}, {"no": "igjen", "zh": "又、再", "note": "", "src": "L4"}, {"no": "sammen", "zh": "一起", "note": "", "src": "L2"}, {"no": "alene", "zh": "一個人", "note": "", "src": "L6"}]}, {"theme": "一天的作息", "words": [{"no": "å våkne", "zh": "醒來", "note": "våkner", "src": "L10"}, {"no": "å stå opp", "zh": "起床", "note": "står opp", "src": "L9"}, {"no": "å gå på badet", "zh": "去浴室", "note": "", "src": "L10"}, {"no": "å pusse tennene", "zh": "刷牙", "note": "pusser", "src": "L10"}, {"no": "å dusje", "zh": "沖澡", "note": "dusjer", "src": "L10"}, {"no": "å vaske håret", "zh": "洗頭", "note": "vasker", "src": "L10"}, {"no": "å vaske seg", "zh": "洗澡、梳洗", "note": "反身", "src": "L8"}, {"no": "å kle på seg", "zh": "穿衣服", "note": "反身", "src": "L8"}, {"no": "å sminke seg", "zh": "化妝", "note": "反身", "src": "L8"}, {"no": "å barbere seg", "zh": "刮鬍子", "note": "反身", "src": "L9"}, {"no": "å lage matpakke", "zh": "做便當", "note": "", "src": "L10"}, {"no": "å rydde", "zh": "收拾", "note": "rydder", "src": "L10"}, {"no": "å sjekke været", "zh": "看天氣", "note": "sjekker", "src": "L10"}, {"no": "å gå på forelesning", "zh": "去上課", "note": "", "src": "L10"}, {"no": "en forelesning", "zh": "講課", "note": "", "src": "L3"}, {"no": "en lesesal", "zh": "自習室", "note": "", "src": "L8"}, {"no": "en kantine", "zh": "學生餐廳", "note": "", "src": "L8"}, {"no": "å møte", "zh": "遇見、碰面", "note": "møter", "src": "L10"}, {"no": "å dra hjem", "zh": "回家", "note": "drar", "src": "L10"}, {"no": "å slappe av", "zh": "放鬆", "note": "slapper av", "src": "L10"}, {"no": "å chatte med venner", "zh": "跟朋友聊天", "note": "", "src": "L10"}, {"no": "å dra på konsert", "zh": "去演唱會", "note": "", "src": "L10"}, {"no": "å legge seg", "zh": "上床睡覺", "note": "反身", "src": "L8"}, {"no": "å sovne", "zh": "睡著", "note": "sovner", "src": "L10"}, {"no": "å sove", "zh": "睡覺", "note": "sover", "src": "L10"}, {"no": "å ta oppvasken", "zh": "洗碗", "note": "", "src": "L8"}, {"no": "å lytte på musikk", "zh": "聽音樂", "note": "", "src": "L8"}, {"no": "å skynde seg", "zh": "趕快", "note": "反身", "src": "L8"}, {"no": "å kose seg", "zh": "玩得開心", "note": "反身", "src": "L8"}, {"no": "å konsentrere seg", "zh": "專心", "note": "反身", "src": "L8"}, {"no": "å ha på seg", "zh": "穿著", "note": "反身", "src": "L9"}, {"no": "en hverdag", "zh": "平日、日常", "note": "", "src": "L8"}, {"no": "fritid", "zh": "空閒時間", "note": "i fritiden", "src": "L9"}, {"no": "en fritidsaktivitet", "zh": "休閒活動", "note": "", "src": "L8"}, {"no": "en venn", "zh": "朋友（男）", "note": "ei venninne 朋友（女）", "src": "L8"}, {"no": "en bybane", "zh": "卑爾根輕軌", "note": "bybanestoppet 輕軌站", "src": "L8"}, {"no": "innendørs", "zh": "室內", "note": "", "src": "L9"}, {"no": "utendørs", "zh": "戶外", "note": "", "src": "L9"}, {"no": "Jeg har lyst til å …", "zh": "我想要…", "note": "", "src": "L8"}, {"no": "Jeg er interessert i …", "zh": "我對…有興趣", "note": "", "src": "L8"}, {"no": "å gå på trening", "zh": "去健身", "note": "på trening", "src": "L4"}, {"no": "et møte", "zh": "會議", "note": "", "src": "L4"}, {"no": "en fest", "zh": "派對", "note": "på fest", "src": "L4"}, {"no": "en konsert", "zh": "演唱會", "note": "på konsert", "src": "L4"}, {"no": "hjem", "zh": "回家（方向）", "note": "hjemme 在家", "src": "L4"}, {"no": "en paraply", "zh": "雨傘", "note": "", "src": "L8"}, {"no": "en sykkel", "zh": "腳踏車", "note": "", "src": "L2"}, {"no": "en bil", "zh": "車", "note": "en biltur 開車旅行", "src": "L7"}]}], "stories": [{"title": "我是誰", "no": "Ny i Bergen", "lines": [["Hei! Jeg heter Grace.", "嗨！我叫 Grace。"], ["Jeg kommer fra Taiwan.", "我來自台灣。"], ["Nå bor jeg i Bergen.", "我現在住在卑爾根。"], ["Jeg studerer økonomi på NHH.", "我在 NHH 讀經濟。"], ["Jeg snakker kinesisk, engelsk og litt norsk.", "我會說中文、英文，和一點點挪威語。"], ["Hyggelig å hilse på deg!", "很高興認識你！"]], "gloss": [["litt", "一點點"], ["økonomi", "經濟"], ["å hilse på", "打招呼、認識"]], "patterns": [["Jeg kommer fra …", "我來自…"], ["Nå bor jeg i …", "nå 放句首，主詞 jeg 退到動詞後面"]], "you": "換你說：Jeg heter ___. Jeg kommer fra ___. Jeg bor i ___."}, {"title": "第一次見面", "no": "Hva heter du?", "lines": [["A: Hei! Hva heter du?", "A：嗨！你叫什麼名字？"], ["B: Jeg heter Eri. Og du?", "B：我叫 Eri。你呢？"], ["A: Jeg heter Grace. Hvor kommer du fra?", "A：我叫 Grace。你從哪裡來？"], ["B: Jeg kommer fra Tokyo i Japan. Hva med deg?", "B：我來自日本東京。那你呢？"], ["A: Jeg kommer fra Taiwan. Hva studerer du?", "A：我來自台灣。你讀什麼？"], ["B: Jeg studerer psykologi. Skal vi ta en kaffe?", "B：我讀心理學。要不要去喝杯咖啡？"], ["A: Ja, gjerne!", "A：好啊！"]], "gloss": [["Og du?", "你呢？"], ["Hva med deg?", "那你呢？（同義）"], ["psykologi", "心理學"], ["Skal vi …?", "我們要不要…？"]], "patterns": [["Hva heter du? / Hvor kommer du fra? / Hva studerer du?", "三個最常用的問句，疑問詞開頭、動詞第二"], ["Skal vi ta en kaffe? – Ja, gjerne!", "邀請和答應"]], "you": "換你說：用這三個問句問一個朋友，再回答一次。"}, {"title": "在咖啡廳", "no": "På kafé", "lines": [["Servitør: Hei! Hva vil du ha?", "店員：嗨！你要什麼？"], ["Grace: Jeg vil gjerne ha en kaffe og et rundstykke, takk.", "Grace：我想要一杯咖啡和一個小圓麵包，謝謝。"], ["Servitør: Med melk?", "店員：要加牛奶嗎？"], ["Grace: Nei takk. Hva koster det?", "Grace：不用，謝謝。多少錢？"], ["Servitør: Det blir 50 kroner.", "店員：一共 50 克朗。"], ["Grace: Kan jeg betale med kort?", "Grace：可以刷卡嗎？"], ["Servitør: Ja, det går bra.", "店員：可以。"]], "gloss": [["en servitør", "服務生"], ["Hva vil du ha?", "你要什麼？"], ["Det blir … kroner.", "一共…克朗"], ["med kort", "刷卡"]], "patterns": [["Jeg vil gjerne ha …, takk.", "點餐最好用的一句"], ["Kan jeg …?", "我可以…嗎？情態動詞開頭的是非問句"]], "you": "換你說：Jeg vil gjerne ha ___ og ___, takk."}, {"title": "早餐時間", "no": "Frokost", "lines": [["Jeg står opp klokken sju.", "我七點起床。"], ["Først går jeg på badet.", "我先去浴室。"], ["Så spiser jeg frokost.", "然後吃早餐。"], ["Jeg spiser en brødskive med ost.", "我吃一片起司麵包。"], ["Jeg drikker en kopp kaffe.", "我喝一杯咖啡。"], ["Jeg liker ikke melk i kaffen.", "我不喜歡咖啡加牛奶。"]], "gloss": [["å stå opp", "起床"], ["klokken sju", "七點"], ["en brødskive", "一片麵包"], ["en kopp", "一杯"]], "patterns": [["Først … Så …", "先…然後…。放句首要倒裝：Først går jeg"], ["Jeg liker ikke …", "ikke 放動詞後面"]], "you": "換你說：Jeg står opp klokken ___. Til frokost spiser jeg ___."}, {"title": "去超市", "no": "På butikken", "lines": [["I dag skal vi lage taco.", "今天我們要做塔可。"], ["Vi må kjøpe kjøttdeig, ost og salat.", "我們得買絞肉、起司和沙拉。"], ["Melk har vi hjemme.", "牛奶家裡有。"], ["Hva koster kjøttdeigen?", "絞肉多少錢？"], ["Den koster 54,90.", "54.90 克朗。"], ["Øl kan vi ikke kjøpe her.", "啤酒這裡買不到。"]], "gloss": [["hjemme", "在家"], ["her", "這裡"], ["kjøttdeigen", "那個絞肉（限定形）"], ["54,90", "唸 femtifire nitti"]], "patterns": [["Vi må kjøpe …", "情態動詞 må + 原形，不加 å"], ["Melk har vi hjemme.", "把 melk 放句首強調，主詞 vi 退到後面"]], "you": "換你說：I dag skal jeg lage ___. Jeg må kjøpe ___ og ___."}, {"title": "我的房間", "no": "Rommet mitt", "lines": [["Jeg bor i en liten leilighet.", "我住在一間小公寓。"], ["Jeg har et eget rom.", "我有自己的房間。"], ["På rommet mitt har jeg en seng og et skrivebord.", "我房間裡有一張床和一張書桌。"], ["På veggen henger det et bilde.", "牆上掛著一幅畫。"], ["Under sengen ligger det mange bøker.", "床底下放著很多書。"], ["Rommet er lite, men koselig.", "房間很小，但很溫馨。"]], "gloss": [["et eget rom", "自己的房間"], ["mange", "很多"], ["men", "但是"], ["koselig", "溫馨、舒服"]], "patterns": [["På veggen henger det …", "地點開頭的 det 句"], ["Rommet er lite", "rom 是 et 名詞，liten 變 lite"]], "you": "換你說：På rommet mitt har jeg ___ og ___."}, {"title": "平常的一天", "no": "En vanlig dag", "lines": [["Om morgenen drikker jeg kaffe.", "早上我喝咖啡。"], ["Etterpå går jeg på forelesning.", "之後我去上課。"], ["Klokken tolv spiser jeg lunsj i kantinen.", "十二點我在學生餐廳吃午餐。"], ["Om ettermiddagen leser jeg på lesesalen.", "下午我在自習室讀書。"], ["Om kvelden lager jeg middag.", "晚上我煮晚餐。"], ["Til slutt slapper jeg av og legger meg.", "最後我放鬆一下，然後上床睡覺。"]], "gloss": [["om morgenen / om kvelden", "每天早上／晚上（習慣）"], ["en kantine", "學生餐廳"], ["en lesesal", "自習室"], ["å slappe av", "放鬆"]], "patterns": [["Om morgenen drikker jeg …", "時間放句首，動詞第二，主詞第三"], ["legger meg", "反身：我上床睡覺"]], "you": "換你說：Om morgenen ___ jeg ___. Om kvelden ___ jeg ___."}, {"title": "週末計畫", "no": "I helgen", "lines": [["A: Hva skal du gjøre i helgen?", "A：你週末要做什麼？"], ["B: På lørdag skal jeg gå på tur.", "B：星期六我要去健行。"], ["A: Så fint! Hva med søndag?", "A：真好！那星期日呢？"], ["B: På søndag skal jeg slappe av og se en film.", "B：星期日我要放鬆，看個電影。"], ["A: Vil du bli med på kafé etterpå?", "A：之後要不要一起去咖啡廳？"], ["B: Ja, gjerne! Vi snakkes!", "B：好啊！再聊！"]], "gloss": [["i helgen", "這個週末"], ["på lørdag", "星期六用 på"], ["å bli med", "一起去、加入"], ["Vi snakkes!", "再聊、回頭見"]], "patterns": [["Hva skal du gjøre …?", "問計畫：skal + 原形"], ["På lørdag skal jeg …", "星期放句首，倒裝"]], "you": "換你說：På lørdag skal jeg ___. På søndag skal jeg ___."}, {"title": "生日", "no": "Bursdag", "lines": [["Når har du bursdag?", "你生日是什麼時候？"], ["Jeg har bursdag tolvte november.", "我的生日是十一月十二日。"], ["Jeg er født i 2000.", "我是 2000 年生的。"], ["I år skal jeg reise til Stockholm.", "今年我要去斯德哥爾摩。"], ["Jeg gleder meg veldig!", "我超期待的！"], ["Hvilken dag er det i dag? Det er fredag.", "今天星期幾？星期五。"]], "gloss": [["tolvte november", "十一月十二日（日用序數）"], ["i 2000", "唸 to tusen"], ["i år", "今年"], ["veldig", "非常"]], "patterns": [["Jeg har bursdag + 日期", "日期先說日的序數，再說月"], ["Jeg gleder meg til …", "反身動詞：期待"]], "you": "換你說：Jeg har bursdag ___. Jeg er født i ___."}, {"title": "朋友來家裡", "no": "Kom inn!", "lines": [["Grace: Hei! Kom inn!", "Grace：嗨！請進！"], ["Sally: Takk! Så koselig leilighet!", "Sally：謝謝！好溫馨的公寓！"], ["Grace: Vil du ha te eller kaffe?", "Grace：你要喝茶還是咖啡？"], ["Sally: Te, takk.", "Sally：茶，謝謝。"], ["Grace: Her er stua, og der er kjøkkenet.", "Grace：這裡是客廳，那邊是廚房。"], ["Grace: Badet er ved siden av soverommet.", "Grace：浴室在臥室旁邊。"]], "gloss": [["Kom inn!", "請進"], ["eller", "還是、或"], ["her / der", "這裡／那裡"], ["ved siden av", "在…旁邊"]], "patterns": [["Vil du ha A eller B?", "問對方要哪一個"], ["Her er …, og der er …", "介紹房子最簡單的說法"]], "you": "換你說：Her er ___, og der er ___."}, {"title": "傳訊息", "no": "En melding", "lines": [["Grace: Hei! Jeg er på kafé nå. Kan du komme?", "Grace：嗨！我現在在咖啡廳。你可以來嗎？"], ["Mar: Beklager, jeg er opptatt. Jeg må lese.", "Mar：抱歉，我在忙。我得讀書。"], ["Grace: Kanskje senere?", "Grace：那晚一點？"], ["Mar: Ja! Jeg ringer deg i kveld.", "Mar：好！我今晚打給你。"], ["Grace: Så bra! Vi snakkes!", "Grace：太好了！再聊！"]], "gloss": [["en melding", "訊息"], ["opptatt", "忙"], ["kanskje", "也許"], ["senere", "晚一點"]], "patterns": [["Kan du komme?", "是非問句：動詞（kan）開頭"], ["Jeg ringer deg i kveld.", "現在式 + 時間詞 = 未來"]], "you": "換你說：Jeg er på ___ nå. Kan du komme?"}, {"title": "我的休閒", "no": "Fritiden min", "lines": [["I fritiden liker jeg å danse.", "空閒時我喜歡跳舞。"], ["Jeg pleier å trene på mandager og onsdager.", "我習慣星期一和星期三運動。"], ["Noen ganger spiller jeg fotball innendørs på NHH.", "有時候我在 NHH 室內踢足球。"], ["Jeg liker ikke å jogge når det er kaldt.", "天氣冷的時候我不喜歡慢跑。"], ["Om sommeren liker jeg å bade.", "夏天我喜歡游泳。"], ["Hva liker du å gjøre i fritiden?", "你空閒時喜歡做什麼？"]], "gloss": [["i fritiden", "空閒時間"], ["på mandager", "每個星期一（複數）"], ["innendørs", "室內"], ["kaldt", "冷（det er kaldt 天氣冷）"]], "patterns": [["Jeg liker å + 原形", "喜歡做某事，第二個動詞加 å"], ["Jeg pleier å + 原形", "我習慣…"]], "you": "換你說：I fritiden liker jeg å ___. Jeg pleier å ___ på ___."}]};
+const TYPE_NAME = {concept:'規則',comparison:'為什麼',procedure:'怎麼搭配',application:'練習'};
+const LS = 'nor10-studio-v1';
+let state = {cards:{}, verbs:{}, order:{}, vocab:{}, log:[]};
+try{ const s = JSON.parse(localStorage.getItem(LS)); if(s && typeof s==='object') state = Object.assign(state, s); }catch(e){}
+function save(){ try{ localStorage.setItem(LS, JSON.stringify(state)); }catch(e){} }
+const today = () => new Date().toISOString().slice(0,10);
+function logEvent(kind, ok){ state.log.push({d:today(), k:kind, ok:ok?1:0}); if(state.log.length>3000) state.log = state.log.slice(-3000); save(); renderStreak(); }
+function esc(s){ return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+// ---- 發音：用瀏覽器內建的語音（Web Speech API），挑挪威語聲音
+let voices = [];
+function loadVoices(){ try{ voices = speechSynthesis.getVoices(); }catch(e){ voices = []; } }
+try{ loadVoices(); speechSynthesis.onvoiceschanged = loadVoices; }catch(e){}
+function pickedVoice(){ const n = (state.voice||''); return n ? voices.find(v=>v.name+'|'+v.lang===n) || null : null; }
+function noVoice(){ return pickedVoice() || voices.find(v=>/^(nb|nn|no)/i.test(v.lang)) || voices.find(v=>/^(da|sv)/i.test(v.lang)) || null; }
+function speak(text, el){
+  if(!('speechSynthesis' in window)) return;
+  try{
+    speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    const v = noVoice(); if(v) u.voice = v; u.lang = v ? v.lang : 'nb-NO'; u.rate = 0.85;
+    if(el){ el.classList.add('playing'); u.onend = u.onerror = ()=>el.classList.remove('playing'); }
+    speechSynthesis.speak(u);
+  }catch(e){}
+}
+// 把一段中文說明裡的挪威語片段變成可以點的字（全形括號裡的英文解釋不算）
+const LATIN = /[A-Za-zÆØÅæøåÉé][A-Za-zÆØÅæøåÉé0-9'’.,?!:\-]*(?: [A-Za-zÆØÅæøåÉé0-9'’.,?!:\-]+)*/g;
+function sayable(text){
+  return String(text).split(/(（[^）]*）)/).map(seg=>{
+    if(seg.startsWith('（')) return esc(seg);
+    return esc(seg).replace(LATIN, m=>{
+      const clean = m.replace(/[.,?!:]+$/,'');
+      if(clean.length < 2 || /^(V2|L\d+|t|s|r|e|m)$/.test(clean)) return m;
+      return `<button class="say" data-say="${esc(clean)}" title="聽發音">${m}</button>`;
+    });
+  }).join('');
+}
+function voiceNote(){
+  if(!('speechSynthesis' in window)) return '<div class="novoice">這個瀏覽器不支援語音朗讀。</div>';
+  if(voices.length && !voices.some(v=>/^(nb|nn|no)/i.test(v.lang))) return '<div class="novoice">你的裝置還沒有挪威語語音，現在會用別的語言的聲音唸，發音不準。到「進度與發音」分頁可以看瀏覽器找到哪些聲音、手動挑一個試聽。</div>';
+  return '';
+}
+document.addEventListener('click', e=>{ const b = e.target.closest('.say,[data-say]'); if(b) speak(b.dataset.say, b); });
+const shuffle = a => { a = a.slice(); for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; };
+
+// ---- spaced repetition (simple Leitner: box 0-4, interval 0/1/3/7/14 days)
+const INTERVALS = [0,1,3,7,14];
+function cardKey(d,c){ return d.id+'/'+c.id; }
+function due(k){ const r = state.cards[k]; if(!r) return true; return r.next <= today(); }
+function grade(k, ok){
+  const r = state.cards[k] || {box:0, seen:0};
+  r.box = ok ? Math.min(4, r.box+1) : 0; r.seen++;
+  const n = new Date(); n.setDate(n.getDate()+INTERVALS[r.box]); r.next = n.toISOString().slice(0,10);
+  state.cards[k] = r; logEvent('card', ok);
+}
+
+// ---- tabs
+const main = document.getElementById('main');
+let tab = 'decks';
+try{ const h = location.hash.slice(1); if(['decks','stories','vocab','verbs','order','stats'].includes(h)) tab = h; }catch(e){}
+document.getElementById('tabs').addEventListener('click', e => {
+  const b = e.target.closest('button[data-tab]'); if(!b) return;
+  tab = b.dataset.tab; render();
+});
+function render(){
+  document.querySelectorAll('#tabs button').forEach(b => b.setAttribute('aria-selected', String(b.dataset.tab===tab)));
+  ({decks:renderDecks, stories:renderStories, vocab:renderVocab, verbs:renderVerbs, order:renderOrder, stats:renderStats})[tab]();
+  renderStreak();
+}
+function renderStreak(){
+  const days = new Set(state.log.map(l=>l.d)); let n=0; const d=new Date();
+  while(days.has(d.toISOString().slice(0,10))){ n++; d.setDate(d.getDate()-1); }
+  const todayN = state.log.filter(l=>l.d===today()).length;
+  document.getElementById('streak').textContent = n ? `連續 ${n} 天 · 今天 ${todayN} 題` : (todayN?`今天 ${todayN} 題`:'');
+}
+
+// ---- Decks
+let session = null;
+function renderDecks(){
+  if(session) return renderSession();
+  const dueAll = DATA.decks.reduce((n,d)=>n+d.cards.filter(c=>due(cardKey(d,c))).length,0);
+  let h = `<h2>五副複習卡，${DATA.decks.reduce((n,d)=>n+d.cards.length,0)} 張</h2>
+  <p class="lead">先看規則和例句，翻面後試著回答問題。卡片上藍色底線的挪威語，點一下就會唸給你聽。答得出來按「記得」，這張卡會隔幾天再出現；答不出來按「再看」，明天再複習一次。今天該複習 ${dueAll} 張。</p>
+  <div class="row" style="margin:0 0 16px">
+    <button class="btn primary" id="studyDue" ${dueAll?'':'disabled'}>複習今天該看的卡</button>
+    <button class="btn" id="studyAll">隨機 15 張</button>
+  </div>${voiceNote()}<div class="grid" style="margin-top:12px">`;
+  DATA.decks.forEach((d,i)=>{
+    const learned = d.cards.filter(c=>(state.cards[cardKey(d,c)]||{}).box>=2).length;
+    const dueN = d.cards.filter(c=>due(cardKey(d,c))).length;
+    h += `<button class="deck" data-deck="${i}"><span class="n">Deck ${i+1}</span><span class="t">${esc(d.short)}</span><span class="d">${esc(d.description)}</span>
+      <span class="bar"><i style="width:${Math.round(learned/d.cards.length*100)}%"></i></span>
+      <span class="meta">${d.cards.length} 張 · 記住 ${learned} · 該複習 ${dueN}</span></button>`;
+  });
+  main.innerHTML = h + '</div>';
+  main.querySelectorAll('.deck').forEach(b=>b.onclick=()=>startSession(DATA.decks[+b.dataset.deck].cards.map(c=>({d:DATA.decks[+b.dataset.deck],c})), DATA.decks[+b.dataset.deck].short));
+  document.getElementById('studyDue').onclick=()=>startSession(shuffle(DATA.decks.flatMap(d=>d.cards.filter(c=>due(cardKey(d,c))).map(c=>({d,c})))), '到期複習');
+  document.getElementById('studyAll').onclick=()=>startSession(shuffle(DATA.decks.flatMap(d=>d.cards.map(c=>({d,c})))).slice(0,15), '隨機 15 張');
+}
+function startSession(items, name){
+  if(!items.length) return;
+  session = {items, i:0, flipped:false, name, ok:0, again:0, browse:false};
+  renderSession();
+}
+function renderSession(){
+  const s = session;
+  if(s.i >= s.items.length){
+    main.innerHTML = `<div class="stage"><h3>${esc(s.name)} 完成</h3><p>記得 ${s.ok} 張，再看 ${s.again} 張。按了「再看」的卡明天會再出現。</p>
+      <div class="row"><button class="btn primary" id="back">回到牌組</button></div></div>`;
+    document.getElementById('back').onclick=()=>{session=null;render();}; return;
+  }
+  const {d,c} = s.items[s.i]; const k = cardKey(d,c); const rec = state.cards[k];
+  let h = `<div class="toolbar"><button class="btn ghost" id="quit">← ${esc(s.name)}</button><span class="spacer"></span><span class="meta">${s.i+1} / ${s.items.length}${rec?` · 第 ${rec.seen+1} 次`:''}</span></div>
+  <div class="stage"><span class="type ${c.type}">${TYPE_NAME[c.type]}</span><h3>${esc(c.title)}</h3>`;
+  if(c.lead) h += `<p class="leadtxt">${sayable(c.lead)}</p>`;
+  h += '<ul class="pts">' + c.points.map(p=>`<li><b>${sayable(p.label)}</b><span>${sayable(p.body)}</span></li>`).join('') + '</ul>';
+  if(s.flipped){
+    h += `<div class="back"><div class="q"><small>考考你</small>${esc(c.q1)}</div><div class="q"><small>想想看</small>${esc(c.q2)}</div></div>
+    <div class="row"><button class="btn again" id="again">再看</button><button class="btn ok" id="ok">記得</button><span class="spacer"></span><button class="btn ghost" id="prev" ${s.i?'':'disabled'}>上一張</button></div>
+    <div class="key">鍵盤：1 再看 · 2 記得</div>`;
+  } else {
+    h += `<div class="row"><button class="btn primary" id="flip">翻到背面</button><span class="spacer"></span><button class="btn ghost" id="prev" ${s.i?'':'disabled'}>上一張</button></div><div class="key">鍵盤：空白鍵翻面</div>`;
+  }
+  main.innerHTML = h + '</div>';
+  document.getElementById('quit').onclick=()=>{session=null;render();};
+  document.getElementById('prev').onclick=()=>{s.i--; s.flipped=false; renderSession();};
+  const flip = document.getElementById('flip'); if(flip) flip.onclick=()=>{s.flipped=true; renderSession();};
+  const ok = document.getElementById('ok'); if(ok) ok.onclick=()=>{grade(k,true); s.ok++; s.i++; s.flipped=false; renderSession();};
+  const ag = document.getElementById('again'); if(ag) ag.onclick=()=>{grade(k,false); s.again++; s.i++; s.flipped=false; renderSession();};
+}
+document.addEventListener('keydown', e=>{
+  if(tab!=='decks' || !session || e.target.matches('input,select,textarea')) return;
+  if(e.key===' ' && !session.flipped){ e.preventDefault(); session.flipped=true; renderSession(); }
+  else if(session.flipped && e.key==='1'){ document.getElementById('again').click(); }
+  else if(session.flipped && e.key==='2'){ document.getElementById('ok').click(); }
+});
+
+// ---- Verbs
+let vq = null;
+const norm = s => s.trim().toLowerCase().replace(/\s+/g,' ');
+function nextVerb(){
+  // prefer verbs with most misses / least seen
+  const pool = DATA.verbs.map(v=>{ const r=state.verbs[v.inf]||{ok:0,bad:0}; return {v, w: 1 + r.bad*3 - Math.min(r.ok,3)}; });
+  const total = pool.reduce((n,p)=>n+Math.max(p.w,0.2),0); let x=Math.random()*total;
+  for(const p of pool){ x -= Math.max(p.w,0.2); if(x<=0) return p.v; }
+  return pool[pool.length-1].v;
+}
+function renderVerbs(){
+  if(!vq) vq = {v: nextVerb(), result:null, n:0, ok:0};
+  const v = vq.v; const r = state.verbs[v.inf]||{ok:0,bad:0};
+  let h = `<h2>動詞拼寫：打出現在式</h2><p class="lead">看到原形和意思，打出現在式（就是「我／你／他」後面接的那個形式）。按 🔊 可以聽發音。寫錯的動詞之後會比較常出現。這輪答對 ${vq.ok} / ${vq.n}。</p>
+  <div class="stage"><div class="vq">${esc(v.inf)}<button class="spk" data-say="${esc(v.inf)}" title="聽原形">🔊</button><small>${esc(v.zh)} · ${esc(v.en)}</small></div><div class="meta">之前答對 ${r.ok} 次 · 答錯 ${r.bad} 次</div>`;
+  if(vq.result===null){
+    h += `<input class="answer" id="ans" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="jeg / du / han …  ___" aria-label="現在式">
+    <div class="row"><button class="btn primary" id="check">檢查</button><button class="btn ghost" id="skip">不知道，看答案</button></div><div class="key">Enter 送出</div>`;
+  } else {
+    const good = vq.result===true;
+    h += `<input class="answer" id="ans" value="${esc(vq.typed)}" disabled>
+    <div class="fb ${good?'good':'bad'}">${good?'正確！':'再記一次：'} ${esc(v.inf)} → <b>${esc(v.pres)}</b><button class="spk" data-say="${esc(v.inf)}, ${esc(v.pres)}" title="聽發音">🔊</button>${good?'':`　（你寫的是「${esc(vq.typed||'—')}」）`}</div>
+    <div class="row"><button class="btn primary" id="next">下一個</button></div><div class="key">Enter 下一個</div>`;
+  }
+  main.innerHTML = h + '</div>';
+  const ans = document.getElementById('ans');
+  const submit = ()=>{
+    const typed = ans.value; const good = norm(typed)===norm(v.pres);
+    const rec = state.verbs[v.inf]||{ok:0,bad:0}; good?rec.ok++:rec.bad++; state.verbs[v.inf]=rec;
+    vq.result=good; vq.typed=typed; vq.n++; if(good) vq.ok++; logEvent('verb', good); renderVerbs();
+  };
+  const goNext = ()=>{ vq.v=nextVerb(); vq.result=null; vq.typed=''; renderVerbs(); };
+  if(vq.result===null){
+    ans.focus();
+    document.getElementById('check').onclick=submit;
+    document.getElementById('skip').onclick=()=>{ ans.value=''; submit(); };
+    ans.onkeydown=e=>{ if(e.key==='Enter') submit(); };
+  } else {
+    const nb = document.getElementById('next'); nb.onclick=goNext; nb.focus();
+    nb.onkeydown=e=>{ if(e.key==='Enter'){ e.preventDefault(); goNext(); } };
+  }
+}
+
+// ---- Sentence order
+let oq = null;
+function newOrder(){
+  const item = DATA.sentences[Math.floor(Math.random()*DATA.sentences.length)];
+  const words = item.s.split(' ');
+  let pool = shuffle(words.map((w,i)=>({w,i})));
+  if(pool.map(p=>p.w).join(' ')===item.s) pool = pool.reverse();
+  oq = {item, words, pool, placed:[], result:null};
+}
+function renderOrder(){
+  if(!oq) newOrder();
+  const q = oq;
+  let h = `<h2>句子重組</h2><p class="lead">把字排回正確順序。開頭的字已經是大寫。小提醒：動詞一定排第二，如果句首是時間詞，主詞要排到動詞後面。</p>
+  <div class="stage"><div class="meta">出自 Leksjon ${esc(q.item.src.slice(1))} · ${q.words.length} 個字</div>
+  <div class="row" style="margin:6px 0 0"><span class="hint">你的句子</span><span class="spacer"></span>${q.placed.length?`<button class="spk" data-say="${esc(q.placed.map(p=>p.w).join(' '))}" title="聽我排的句子">🔊</button>`:''}</div><div class="chips" id="placed" aria-label="你的句子" style="margin-top:4px">${q.placed.map((p,i)=>`<button class="chip placed" data-i="${i}">${esc(p.w)}</button>`).join('')||'<span class="hint">點下面的字，照順序放進來</span>'}</div>
+  <div class="chips" id="pool" aria-label="可用的字">${q.pool.map((p,i)=>`<button class="chip" data-i="${i}">${esc(p.w)}</button>`).join('')}</div>`;
+  if(q.result!==null){
+    h += `<div class="fb ${q.result?'good':'bad'}">${q.result?'正確！':'正確答案：'} <b>${esc(q.item.s)}</b><button class="spk" data-say="${esc(q.item.s)}" title="聽整句">🔊</button></div>`;
+  }
+  h += `<div class="row">${q.result===null?`<button class="btn primary" id="check" ${q.pool.length?'disabled':''}>檢查</button><button class="btn ghost" id="reset">重排</button>`:`<button class="btn primary" id="next">下一句</button>`}</div></div>`;
+  main.innerHTML = h;
+  if(q.result===null){
+    main.querySelectorAll('#pool .chip').forEach(b=>b.onclick=()=>{ q.placed.push(q.pool.splice(+b.dataset.i,1)[0]); renderOrder(); });
+    main.querySelectorAll('#placed .chip').forEach(b=>b.onclick=()=>{ q.pool.push(q.placed.splice(+b.dataset.i,1)[0]); renderOrder(); });
+    document.getElementById('check').onclick=()=>{
+      const good = q.placed.map(p=>p.w).join(' ')===q.item.s;
+      const rec = state.order[q.item.s]||{ok:0,bad:0}; good?rec.ok++:rec.bad++; state.order[q.item.s]=rec;
+      q.result=good; logEvent('order', good); renderOrder();
+    };
+    document.getElementById('reset').onclick=()=>{ q.pool = shuffle(q.pool.concat(q.placed)); q.placed=[]; renderOrder(); };
+  } else {
+    document.getElementById('next').onclick=()=>{ newOrder(); renderOrder(); };
+  }
+}
+
+// ---- Stories
+let so = {i:null, hideZh:false, cur:-1};
+function sread(i){ return (state.stories||{})[i]; }
+function renderStories(){
+  if(so.i===null){
+    let h = `<h2>情境小短文</h2><p class="lead">每篇 5–7 句，只用上課教過的字。先聽一遍，再一句一句看。中文想自己猜的話，可以先遮起來。</p><div class="st-list">`;
+    h += DATA.stories.map((s,i)=>`<button class="st-item ${sread(i)?'read':''}" data-i="${i}"><span class="no">${esc(s.no)}</span><span class="t">${esc(s.title)}</span><span class="m">${s.lines.length} 句${sread(i)?' · 讀過了':''}</span></button>`).join('');
+    main.innerHTML = h + '</div>';
+    main.querySelectorAll('.st-item').forEach(b=>b.onclick=()=>{ so.i=+b.dataset.i; so.cur=-1; renderStories(); window.scrollTo(0,0); });
+    return;
+  }
+  const s = DATA.stories[so.i];
+  const strip = t => t.replace(/^[A-Za-zÆØÅæøå]+: /,'');
+  let h = `<div class="toolbar"><button class="btn ghost" id="stBack">← 所有短文</button><span class="spacer"></span><span class="meta">${so.i+1} / ${DATA.stories.length}</span></div>
+  <div class="stage"><span class="type concept">${esc(s.no)}</span><h3>${esc(s.title)}</h3>
+  <div class="row" style="margin-top:4px"><button class="btn primary" id="stPlay">🔊 聽整篇</button><button class="btn ${so.hideZh?'again':''}" id="stHide">${so.hideZh?'顯示中文':'遮住中文'}</button></div>
+  <p class="hint" style="margin:10px 0 0">點任何一句可以單獨聽。</p>
+  <div class="lines">` + s.lines.map((l,i)=>`<div class="line ${so.cur===i?'cur':''}" data-i="${i}"><span class="n">${i+1}</span><span><span class="no">${esc(l[0])}</span><br><span class="zh ${so.hideZh?'hide':''}">${esc(l[1])}</span></span></div>`).join('') + `</div>
+  <h4>生字</h4><div class="gl">${s.gloss.map(g=>`<span><b class="say" data-say="${esc(g[0].replace(/^å /,'å '))}">${esc(g[0])}</b> ${esc(g[1])}</span>`).join('')}</div>
+  <h4>這篇的句型</h4><ul class="pat">${s.patterns.map(p=>`<li><b>${esc(p[0])}</b>${esc(p[1])}</li>`).join('')}</ul>
+  <div class="you">${esc(s.you)}</div>
+  <div class="row"><button class="btn ok" id="stDone">${sread(so.i)?'讀過了 ✓':'我讀完了'}</button><span class="spacer"></span>${so.i<DATA.stories.length-1?'<button class="btn" id="stNext">下一篇 →</button>':''}</div>
+  </div>`;
+  main.innerHTML = h;
+  document.getElementById('stBack').onclick=()=>{ so.i=null; renderStories(); };
+  document.getElementById('stHide').onclick=()=>{ so.hideZh=!so.hideZh; renderStories(); };
+  main.querySelectorAll('.line').forEach(el=>el.onclick=e=>{ if(e.target.closest('.say')) return; const i=+el.dataset.i; so.cur=i; el.querySelector('.zh').classList.remove('hide'); main.querySelectorAll('.line').forEach(x=>x.classList.toggle('cur', x===el)); speak(strip(s.lines[i][0])); });
+  document.getElementById('stPlay').onclick=()=>playLines(s.lines.map(l=>strip(l[0])));
+  document.getElementById('stDone').onclick=()=>{ state.stories=state.stories||{}; state.stories[so.i]=1; logEvent('story', true); renderStories(); };
+  const nx=document.getElementById('stNext'); if(nx) nx.onclick=()=>{ so.i++; so.cur=-1; renderStories(); window.scrollTo(0,0); };
+}
+function playLines(texts){
+  if(!('speechSynthesis' in window)) return;
+  try{ speechSynthesis.cancel(); }catch(e){}
+  const v = noVoice();
+  texts.forEach((t,i)=>{
+    const u = new SpeechSynthesisUtterance(t); if(v) u.voice=v; u.lang = v?v.lang:'nb-NO'; u.rate=0.8;
+    u.onstart=()=>{ main.querySelectorAll('.line').forEach((el,j)=>el.classList.toggle('cur', j===i)); };
+    try{ speechSynthesis.speak(u); }catch(e){}
+  });
+}
+
+// ---- Vocab
+let vo = {theme:0, mode:'browse', hide:'none', q:null, n:0, ok:0};
+try{ const t = +localStorage.getItem(LS+'-vtheme'); if(t>=0 && t<DATA.vocab.length) vo.theme=t; }catch(e){}
+const wkey = w => w.no;
+function wstat(w){ return state.vocab[wkey(w)] || {ok:0,bad:0}; }
+function wclass(w){ const r=wstat(w); if(r.ok>=3 && r.ok>r.bad) return 'k'; if(r.bad>r.ok) return 'm'; return ''; }
+function renderVocab(){
+  const T = DATA.vocab[vo.theme]; const words = T.words;
+  const known = words.filter(w=>wclass(w)==='k').length;
+  let h = `<h2>基礎單字</h2><p class="lead">Leksjon 1–10 講義裡出現過的字，分成 ${DATA.vocab.length} 個主題。先在「瀏覽」認識，再用「測驗」檢查有沒有記住。點挪威語可以聽發音。</p>
+  <div class="theme-row">${DATA.vocab.map((t,i)=>`<button data-t="${i}" aria-pressed="${i===vo.theme}">${esc(t.theme)} <span class="meta">${t.words.filter(w=>wclass(w)==='k').length}/${t.words.length}</span></button>`).join('')}</div>
+  <div class="toolbar"><button class="btn ${vo.mode==='browse'?'primary':''}" id="mBrowse">瀏覽</button><button class="btn ${vo.mode==='quiz'?'primary':''}" id="mQuiz">測驗</button><span class="spacer"></span><span class="meta">${esc(T.theme)} · ${words.length} 個字 · 會了 ${known}</span></div>`;
+  if(vo.mode==='browse'){
+    h += `<div class="toolbar"><span class="hint">遮住：</span><button class="btn ghost ${vo.hide==='none'?'primary':''}" data-hide="none">都不遮</button><button class="btn ghost ${vo.hide==='zh'?'primary':''}" data-hide="zh">遮中文</button><button class="btn ghost ${vo.hide==='no'?'primary':''}" data-hide="no">遮挪威語</button></div>
+    <div class="stage"><ul class="wl">` + words.map(w=>`<li>
+      <span class="no ${vo.hide==='no'?'zh hide':''}"><span class="dot ${wclass(w)}"></span><button class="say" data-say="${esc(w.no)}">${esc(w.no)}</button></span>
+      <span class="zh ${vo.hide==='zh'?'hide':''}">${esc(w.zh)}</span>
+      ${w.note?`<span class="nt">${sayable(w.note)}</span>`:''}</li>`).join('') + '</ul></div>';
+  } else {
+    if(!vo.q) newVocabQ();
+    const q = vo.q;
+    h += `<div class="stage"><div class="meta">${q.dir==='no2zh'?'這個字是什麼意思？':'「'+esc(q.w.zh)+'」的挪威語是？'} · 這輪 ${vo.ok} / ${vo.n}</div>
+      <div class="vq">${q.dir==='no2zh'?`${esc(q.w.no)}<button class="spk" data-say="${esc(q.w.no)}">🔊</button>`:esc(q.w.zh)}</div>
+      <div class="opts">${q.opts.map((o,i)=>{
+        let cls='opt'; if(q.picked!==null){ if(o===q.w) cls+=' right'; else if(i===q.picked) cls+=' wrong'; }
+        return `<button class="${cls}" data-i="${i}" ${q.picked!==null?'disabled':''}>${esc(q.dir==='no2zh'?o.zh:o.no)}</button>`; }).join('')}</div>
+      ${q.picked!==null?`<div class="fb ${q.picked===q.opts.indexOf(q.w)?'good':'bad'}">${esc(q.w.no)} = ${esc(q.w.zh)}${q.w.note?`　<span class="hint">${esc(q.w.note)}</span>`:''}<button class="spk" data-say="${esc(q.w.no)}">🔊</button></div>
+      <div class="row"><button class="btn primary" id="vNext">下一題</button></div><div class="key">Enter 下一題</div>`:'<div class="key">鍵盤：1–4 選答案</div>'}
+    </div>`;
+  }
+  main.innerHTML = h;
+  main.querySelectorAll('.theme-row button').forEach(b=>b.onclick=()=>{ vo.theme=+b.dataset.t; vo.q=null; vo.n=0; vo.ok=0; try{localStorage.setItem(LS+'-vtheme',vo.theme);}catch(e){} renderVocab(); });
+  document.getElementById('mBrowse').onclick=()=>{ vo.mode='browse'; renderVocab(); };
+  document.getElementById('mQuiz').onclick=()=>{ vo.mode='quiz'; vo.q=null; renderVocab(); };
+  main.querySelectorAll('[data-hide]').forEach(b=>b.onclick=()=>{ vo.hide=b.dataset.hide; renderVocab(); });
+  main.querySelectorAll('.wl .hide').forEach(el=>el.onclick=e=>{ if(e.target.closest('.say')) return; el.classList.remove('hide'); });
+  if(vo.mode==='quiz'){
+    main.querySelectorAll('.opt').forEach(b=>b.onclick=()=>answerVocab(+b.dataset.i));
+    const nb=document.getElementById('vNext'); if(nb){ nb.onclick=()=>{ newVocabQ(); renderVocab(); }; nb.focus(); }
+  }
+}
+function newVocabQ(){
+  const words = DATA.vocab[vo.theme].words;
+  const pool = words.map(w=>{ const r=wstat(w); return {w, wt: 1 + r.bad*2 - Math.min(r.ok,3)*0.3}; });
+  const total = pool.reduce((n,p)=>n+Math.max(p.wt,0.2),0); let x=Math.random()*total; let w=pool[0].w;
+  for(const p of pool){ x-=Math.max(p.wt,0.2); if(x<=0){ w=p.w; break; } }
+  const others = shuffle(words.filter(o=>o!==w && o.zh!==w.zh)).slice(0,3);
+  vo.q = {w, opts: shuffle([w,...others]), dir: Math.random()<0.6?'no2zh':'zh2no', picked:null};
+}
+function answerVocab(i){
+  const q=vo.q; if(q.picked!==null) return;
+  q.picked=i; const good = q.opts[i]===q.w;
+  const r = wstat(q.w); good?r.ok++:r.bad++; state.vocab[wkey(q.w)]=r;
+  vo.n++; if(good) vo.ok++; logEvent('vocab', good); renderVocab();
+}
+document.addEventListener('keydown', e=>{
+  if(tab!=='vocab' || vo.mode!=='quiz' || !vo.q || e.target.matches('input,select,textarea')) return;
+  if(vo.q.picked===null && /^[1-4]$/.test(e.key)) answerVocab(+e.key-1);
+  else if(vo.q.picked!==null && e.key==='Enter'){ e.preventDefault(); newVocabQ(); renderVocab(); }
+});
+
+// ---- Stats
+function renderStats(){
+  const total = DATA.decks.reduce((n,d)=>n+d.cards.length,0);
+  const boxes = [0,0,0,0,0];
+  DATA.decks.forEach(d=>d.cards.forEach(c=>{ const r=state.cards[cardKey(d,c)]; boxes[r?r.box:0]++; }));
+  const vSeen = Object.keys(state.verbs).length;
+  const vMastered = Object.values(state.verbs).filter(r=>r.ok>=2 && r.ok>r.bad).length;
+  const days = {}; state.log.forEach(l=>{ days[l.d]=days[l.d]||{n:0,ok:0}; days[l.d].n++; days[l.d].ok+=l.ok; });
+  const recent = Object.entries(days).sort((a,b)=>b[0]<a[0]?-1:1).slice(0,14);
+  const hard = Object.entries(state.verbs).filter(([,r])=>r.bad>0).sort((a,b)=>b[1].bad-a[1].bad).slice(0,8);
+  loadVoices();
+  const cur = noVoice();
+  const opts = voices.map(v=>`<option value="${esc(v.name+'|'+v.lang)}" ${cur&&cur.name===v.name&&cur.lang===v.lang?'selected':''}>${esc(v.name)}（${esc(v.lang)}）</option>`).join('');
+  let h = `<h2>發音設定</h2>
+  <div class="stage" style="margin-bottom:20px">
+    <p class="hint" style="margin:0 0 8px">瀏覽器看到 ${voices.length} 個聲音。${cur?`目前用的是「${esc(cur.name)}（${esc(cur.lang)}）」。`:'沒有找到挪威語的聲音。'}挪威語的語言代碼會是 nb、nn 或 no 開頭。</p>
+    <div class="toolbar" style="margin:0"><select id="voiceSel" aria-label="選擇聲音" style="max-width:100%"><option value="">自動（優先挪威語）</option>${opts}</select><button class="btn" id="voiceTest">試聽</button><button class="btn ghost" id="voiceReload">重新掃描</button></div>
+    ${voices.length===0?'<div class="novoice">清單是空的。先點一次「試聽」再按「重新掃描」，有些手機要先用過一次才會列出來。</div>':''}
+    ${voices.length&&!voices.some(v=>/^(nb|nn|no)/i.test(v.lang))?'<div class="novoice">清單裡沒有挪威語。三星手機：手機設定 → 文字轉語音 → 偏好的引擎選 Samsung → 齒輪 → Install voice data → Norwegian Bokmål。裝好後把瀏覽器完全關掉再開。</div>':''}
+  </div>
+  <h2>學習進度</h2><p class="lead">這些紀錄只存在這個瀏覽器裡。</p>
+  <div class="score">
+    <div><b>${boxes[3]+boxes[4]}<span style="font-size:.9rem;color:var(--muted)"> / ${total}</span></b><span>記住的卡（7 天以上才會再出現）</span></div>
+    <div><b>${boxes[0]}</b><span>還沒看過、或上次按「再看」的卡</span></div>
+    <div><b>${vMastered}<span style="font-size:.9rem;color:var(--muted)"> / 59</span></b><span>掌握的動詞</span></div>
+    <div><b>${vSeen}</b><span>練習過的動詞</span></div>
+    <div><b>${Object.keys(state.stories||{}).length}<span style="font-size:.9rem;color:var(--muted)"> / ${DATA.stories.length}</span></b><span>讀過的短文</span></div>
+    <div><b>${DATA.vocab.reduce((n,t)=>n+t.words.filter(w=>wclass(w)==='k').length,0)}<span style="font-size:.9rem;color:var(--muted)"> / ${DATA.vocab.reduce((n,t)=>n+t.words.length,0)}</span></b><span>會了的單字（測驗答對 3 次以上）</span></div>
+  </div>
+  <div class="stage"><h3 style="font-size:1.05rem;margin-top:0">每副卡記住多少</h3><ul class="pts">`;
+  DATA.decks.forEach(d=>{
+    const learned = d.cards.filter(c=>(state.cards[cardKey(d,c)]||{}).box>=2).length;
+    h += `<li><b>${esc(d.short)}</b><span><span class="bar" style="margin:8px 0 2px"><i style="width:${Math.round(learned/d.cards.length*100)}%"></i></span><span class="meta">${learned} / ${d.cards.length}</span></span></li>`;
+  });
+  h += '</ul></div>';
+  if(hard.length){
+    h += `<div class="stage" style="margin-top:12px"><h3 style="font-size:1.05rem;margin-top:0">最常寫錯的動詞</h3><ul class="pts">` +
+      hard.map(([inf,r])=>{ const v=DATA.verbs.find(x=>x.inf===inf); return `<li><b>${esc(inf)}</b><span>${esc(v.pres)} · ${esc(v.zh)} <span class="meta">（錯 ${r.bad} 次）</span></span></li>`; }).join('') + '</ul></div>';
+  }
+  h += `<div class="stage" style="margin-top:12px"><h3 style="font-size:1.05rem;margin-top:0">最近 14 天</h3>`;
+  h += recent.length ? '<ul class="pts">' + recent.map(([d,x])=>`<li><b>${d}</b><span>${x.n} 題，答對 ${x.ok}</span></li>`).join('') + '</ul>' : '<div class="empty">還沒有紀錄，先去練一輪吧</div>';
+  h += `</div><div class="row"><button class="btn ghost" id="wipe">清除所有紀錄</button></div>`;
+  main.innerHTML = h;
+  document.getElementById('voiceSel').onchange = e => { state.voice = e.target.value; save(); renderStats(); };
+  document.getElementById('voiceTest').onclick = e => speak('Hei! Jeg heter Grace. Jeg bor i Bergen og snakker litt norsk.', e.target);
+  document.getElementById('voiceReload').onclick = () => { loadVoices(); renderStats(); };
+  document.getElementById('wipe').onclick = e => {
+    if(e.target.dataset.sure){ state={cards:{},verbs:{},order:{},vocab:{},stories:{},log:[]}; save(); render(); }
+    else { e.target.dataset.sure='1'; e.target.textContent='再按一次確認清除'; e.target.classList.add('again'); }
+  };
+}
+render();
+</script>
+</body>
+</html>
